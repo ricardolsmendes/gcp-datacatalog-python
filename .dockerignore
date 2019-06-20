@@ -1,5 +1,10 @@
+# Git
+.git
+.gitignore
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
+**/__pycache__
 *.py[cod]
 *$py.class
 
@@ -107,5 +112,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# GCP access files
-credentials/
+# Diagrams
+diagrams/
