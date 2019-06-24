@@ -8,19 +8,30 @@ import argparse
 
 from google.cloud import datacatalog_v1beta1
 
-# Instantiates the API client.
-datacatalog = datacatalog_v1beta1.DataCatalogClient()
 
+class DataCatalogHelper:
 
-# Catalog search
-def search_catalog(organization_id, query):
-    """Searches Data Catalog entries for a given organization."""
+    @staticmethod
+    def __make_search_results_list(results_pages_iterator):
+        return [result for result in results_pages_iterator]
 
-    scope = datacatalog_v1beta1.types.SearchCatalogRequest.Scope()
-    scope.include_org_ids.append(organization_id)
+    def __init__(self):
+        # Initialize the API client.
+        self.__datacatalog = datacatalog_v1beta1.DataCatalogClient()
 
-    results_iterator = datacatalog.search_catalog(scope=scope, query=query)
-    return [result for result in results_iterator]
+    def lookup_entry(self, linked_resource):
+        """Lookup the Data Catalog Entry for a given resource."""
+
+        return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
+
+    def search_catalog(self, organization_id, query):
+        """Search Data Catalog for a given organization."""
+
+        scope = datacatalog_v1beta1.types.SearchCatalogRequest.Scope()
+        scope.include_org_ids.append(organization_id)
+
+        return DataCatalogHelper.__make_search_results_list(
+            self.__datacatalog.search_catalog(scope=scope, query=query))
 
 
 if __name__ == '__main__':
@@ -33,3 +44,25 @@ if __name__ == '__main__':
     parser.add_argument('project_id', help='Your Google Cloud project ID')
 
     args = parser.parse_args()
+
+    datacatalog_helper = DataCatalogHelper()
+
+    bq_datasets_search_results = datacatalog_helper.search_catalog(
+        args.organization_id, 'system=bigquery type=dataset quickstart')
+
+    print(bq_datasets_search_results)
+
+    bq_tables_column_search_results = datacatalog_helper.search_catalog(
+        args.organization_id, 'column:email')
+
+    print(bq_tables_column_search_results)
+
+    table_1_entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{args.project_id}'
+                                                    f'/datasets/data_catalog_quickstart/tables/quickstart_table_1')
+
+    print(table_1_entry)
+
+    table_2_entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{args.project_id}'
+                                                    f'/datasets/data_catalog_quickstart/tables/quickstart_table_2')
+
+    print(table_2_entry)
