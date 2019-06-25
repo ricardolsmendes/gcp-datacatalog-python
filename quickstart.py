@@ -19,6 +19,11 @@ class DataCatalogHelper:
         # Initialize the API client.
         self.__datacatalog = datacatalog_v1beta1.DataCatalogClient()
 
+    def get_entry(self, name):
+        """Get the Data Catalog Entry for a given name."""
+
+        return self.__datacatalog.get_entry(name=name)
+
     def lookup_entry(self, linked_resource):
         """Lookup the Data Catalog Entry for a given resource."""
 
@@ -57,12 +62,19 @@ if __name__ == '__main__':
 
     print(bq_tables_column_search_results)
 
-    table_1_entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{args.project_id}'
-                                                    f'/datasets/data_catalog_quickstart/tables/quickstart_table_1')
+    table_2_resource_name = \
+        f'//bigquery.googleapis.com/projects/{args.project_id}'\
+        f'/datasets/data_catalog_quickstart/tables/quickstart_table_2'
+    table_2_search_result = next(result for result in bq_tables_column_search_results
+                                 if result.linked_resource == table_2_resource_name)
 
-    print(table_1_entry)
-
-    table_2_entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{args.project_id}'
-                                                    f'/datasets/data_catalog_quickstart/tables/quickstart_table_2')
+    table_2_entry = datacatalog_helper.get_entry(table_2_search_result.relative_resource_name)
 
     print(table_2_entry)
+
+    table_1_resource_name = \
+        f'//bigquery.googleapis.com/projects/{args.project_id}' \
+        f'/datasets/data_catalog_quickstart/tables/quickstart_table_1'
+    table_1_entry = datacatalog_helper.lookup_entry(table_1_resource_name)
+
+    print(table_1_entry)
