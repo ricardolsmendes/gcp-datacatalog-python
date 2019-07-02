@@ -12,9 +12,36 @@ PROJECT_ID = os.environ['GOOGLE_CLOUD_PROJECT_ID']
 datacatalog_helper = DataCatalogHelper()
 
 
+def __make_field_descriptor(field_id, field_type, display_name):
+    return {
+        'id': field_id,
+        'type': field_type,
+        'display_name': display_name
+    }
+
+
+def test_create_tag_template():
+    template = datacatalog_helper.create_tag_template(
+        project_id=PROJECT_ID,
+        template_id='quickstart_test_template',
+        display_name='Testing Tag Templates',
+        primitive_fields_descriptors=[
+            __make_field_descriptor('boolean_field', 'BOOL', 'Testing boolean fields'),
+            __make_field_descriptor('double_field', 'DOUBLE', 'Testing double fields'),
+            __make_field_descriptor('string_field', 'STRING', 'Testing string fields'),
+            __make_field_descriptor('datetime_field', 'TIMESTAMP', 'Testing timestamp fields')
+        ]
+    )
+
+    assert template.name == f'projects/{PROJECT_ID}/locations/us-central1/tagTemplates/quickstart_test_template'
+
+    # Clean up.
+    datacatalog_helper.delete_tag_template(name=template.name)
+
+
 def test_get_entry_success(table):
     results = datacatalog_helper.search_catalog(
-        ORGANIZATION_ID, 'system=bigquery type=table quickstart_table_2')
+        ORGANIZATION_ID, 'system=bigquery type=table name:quickstart_table_2')
 
     table_resource_name = \
         f'//bigquery.googleapis.com/projects/{PROJECT_ID}' \
@@ -48,14 +75,14 @@ def test_lookup_entry_failure_permission_denied(table):
 
 def test_search_catalog_bigquery_dataset_with_results(dataset):
     results = datacatalog_helper.search_catalog(
-        ORGANIZATION_ID, 'system=bigquery type=dataset quickstart')
+        ORGANIZATION_ID, 'system=bigquery type=dataset name:quickstart')
     assert len(results) > 0
     assert next(result for result in results if 'quickstart_test_dataset' in result.linked_resource)
 
 
 def test_search_catalog_bigquery_dataset_with_no_results():
     results = datacatalog_helper.search_catalog(
-        ORGANIZATION_ID, 'system=bigquery type=dataset abc_xyz')
+        ORGANIZATION_ID, 'system=bigquery type=dataset name:abc_xyz')
     assert len(results) == 0
 
 
