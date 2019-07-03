@@ -3,14 +3,14 @@ import pytest
 
 from google.cloud import bigquery
 
-PROJECT_ID = os.environ['GOOGLE_CLOUD_PROJECT_ID']
+TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
 bigquery_client = bigquery.Client()
 
 
 @pytest.fixture
 def dataset(scope='function'):
-    name = f'{PROJECT_ID}.quickstart_test_dataset'
+    name = f'{TEST_PROJECT_ID}.quickstart_test_dataset'
     dataset = bigquery_client.create_dataset(name)
     yield dataset
     bigquery_client.delete_dataset(dataset)
@@ -18,7 +18,7 @@ def dataset(scope='function'):
 
 @pytest.fixture
 def table(dataset, scope='function'):
-    name = f'{PROJECT_ID}.{dataset.dataset_id}.quickstart_test_table_2'
+    name = f'{TEST_PROJECT_ID}.{dataset.dataset_id}.quickstart_test_table_2'
     schema = [
         bigquery.SchemaField('name', 'STRING', 'REQUIRED'),
         bigquery.SchemaField('email', 'STRING', 'REQUIRED')

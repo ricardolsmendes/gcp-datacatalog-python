@@ -29,7 +29,7 @@ class DataCatalogHelper:
     def create_tag_template(self, project_id, template_id, display_name, primitive_fields_descriptors):
         """Create a Tag Template."""
 
-        parent = self.__datacatalog.location_path(project_id, 'us-central1')
+        location = self.__datacatalog.location_path(project_id, 'us-central1')
 
         template = datacatalog_v1beta1.types.TagTemplate()
         template.display_name = display_name
@@ -40,17 +40,39 @@ class DataCatalogHelper:
             template.fields[field['id']].display_name = field['display_name']
 
         return self.__datacatalog.create_tag_template(
-            parent=parent, tag_template_id=template_id, tag_template=template)
+            parent=location, tag_template_id=template_id, tag_template=template)
+
+    def create_tag_template_field(self, template_name, field_id, display_name, enum_values):
+        """Add field to a Tag Template."""
+
+        field = datacatalog_v1beta1.types.TagTemplateField()
+        field.display_name = display_name
+
+        for enum_value in enum_values:
+            field.type.enum_type.allowed_values.add().display_name = enum_value['display_name']
+
+        return self.__datacatalog.create_tag_template_field(
+            parent=template_name, tag_template_field_id=field_id, tag_template_field=field)
 
     def delete_tag_template(self, name):
         """Delete a Tag Template."""
 
         self.__datacatalog.delete_tag_template(name=name, force=True)
 
+    def delete_tag_template_field(self, name):
+        """Delete a Tag Template field."""
+
+        self.__datacatalog.delete_tag_template_field(name=name, force=True)
+
     def get_entry(self, name):
         """Get the Data Catalog Entry for a given name."""
 
         return self.__datacatalog.get_entry(name=name)
+
+    def get_tag_template(self, name):
+        """Get the Tag Template for a given name."""
+
+        return self.__datacatalog.get_tag_template(name=name)
 
     def lookup_entry(self, linked_resource):
         """Lookup the Data Catalog Entry for a given resource."""
@@ -107,6 +129,7 @@ if __name__ == '__main__':
 
     print(table_1_entry)
 
+    # Delete a Tag Template with the same name if it already exists.
     try:
         datacatalog_helper.delete_tag_template(f'projects/{args.project_id}/locations/us-central1/'
                                                f'tagTemplates/quickstart_classification_template')
@@ -123,4 +146,17 @@ if __name__ == '__main__':
             'display_name': 'Has PII'
         }])
 
+    print(tag_template)
+
+    datacatalog_helper.create_tag_template_field(
+        template_name=tag_template.name,
+        field_id='pii_type',
+        display_name='PII Type',
+        enum_values=[
+            {'display_name': 'EMAIL'},
+            {'display_name': 'SOCIAL SECURITY NUMBER'}
+        ]
+    )
+
+    tag_template = datacatalog_helper.get_tag_template(tag_template.name)
     print(tag_template)
