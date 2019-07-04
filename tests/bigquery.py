@@ -1,3 +1,4 @@
+import time
 import os
 import pytest
 
@@ -12,7 +13,10 @@ bigquery_client = bigquery.Client()
 def dataset(scope='function'):
     name = f'{TEST_PROJECT_ID}.quickstart_test_dataset'
     dataset = bigquery_client.create_dataset(name)
+
+    time.sleep(3)  # Wait a few seconds for Data Catalog's search index sync/update.
     yield dataset
+
     bigquery_client.delete_dataset(dataset)
 
 
@@ -24,5 +28,8 @@ def table(dataset, scope='function'):
         bigquery.SchemaField('email', 'STRING', 'REQUIRED')
     ]
     table = bigquery_client.create_table(bigquery.Table(name, schema=schema))
+
+    time.sleep(3)  # Wait a few seconds for Data Catalog's search index sync/update.
     yield table
+
     bigquery_client.delete_table(table)
