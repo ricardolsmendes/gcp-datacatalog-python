@@ -19,14 +19,10 @@ class DataCatalogHelper:
     @staticmethod
     def __set_tag_field_value(field, value, primitive_type=None):
         set_primitive_field_value_functions = {
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL:
-                DataCatalogHelper.__set_bool_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE:
-                DataCatalogHelper.__set_double_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING:
-                DataCatalogHelper.__set_string_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP:
-                DataCatalogHelper.__set_timestamp_field_value
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL: DataCatalogHelper.__set_bool_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE: DataCatalogHelper.__set_double_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING: DataCatalogHelper.__set_string_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP: DataCatalogHelper.__set_timestamp_field_value
         }
 
         if primitive_type:
@@ -168,7 +164,7 @@ if __name__ == '__main__':
     print(bq_tables_column_search_results)
 
     # ================================================================================
-    # 3. Get the catalog entry for quickstart_table_2.
+    # 3. Get the catalog entry for quickstart_table_2 based on search results.
     # ================================================================================
     table_2_resource_name = f'//bigquery.googleapis.com/projects/{args.project_id}'\
                             f'/datasets/data_catalog_quickstart/tables/quickstart_table_2'
@@ -180,7 +176,7 @@ if __name__ == '__main__':
     print(table_2_entry)
 
     # ================================================================================
-    # 4. Get the catalog entry for quickstart_table_1.
+    # 4. Lookup the catalog entry for quickstart_table_1.
     # ================================================================================
     table_1_resource_name = f'//bigquery.googleapis.com/projects/{args.project_id}' \
                             f'/datasets/data_catalog_quickstart/tables/quickstart_table_1'

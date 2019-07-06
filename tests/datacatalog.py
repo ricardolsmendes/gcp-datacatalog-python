@@ -1,5 +1,6 @@
 import os
 import pytest
+import time
 
 from google.api_core.exceptions import PermissionDenied
 from google.cloud import datacatalog_v1beta1
@@ -38,16 +39,18 @@ def tag_template(scope='function'):
     tag_template = datacatalog_client.create_tag_template(
         parent=location, tag_template_id='quickstart_test_tag_template', tag_template=template)
 
+    time.sleep(2)  # Wait a few seconds for Data Catalog's search index sync/update.
     yield tag_template
 
     datacatalog_client.delete_tag_template(tag_template.name, force=True)
+    time.sleep(2)  # Wait a few seconds for Data Catalog's search index sync/update.
 
 
 @pytest.fixture
 def table_entry(table, scope='function'):
     entry = datacatalog_client.lookup_entry(
-        linked_resource=f'//bigquery.googleapis.com/projects/{TEST_PROJECT_ID}'
-                        f'/datasets/quickstart_test_dataset/tables/quickstart_test_table_2')
+        linked_resource=f'//bigquery.googleapis.com/projects/{table.project}'
+                        f'/datasets/{table.dataset_id}/tables/{table.table_id}')
 
     yield entry
 
@@ -65,6 +68,8 @@ def tag(table_entry, tag_template, scope='function'):
 
     tag = datacatalog_client.create_tag(parent=table_entry.name, tag=tag)
 
+    time.sleep(2)  # Wait a few seconds for Data Catalog's search index sync/update.
     yield tag
 
     datacatalog_client.delete_tag(tag.name)
+    time.sleep(2)  # Wait a few seconds for Data Catalog's search index sync/update.

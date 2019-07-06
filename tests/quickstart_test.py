@@ -1,4 +1,5 @@
 import os
+import re
 
 from google.api_core.exceptions import InvalidArgument, PermissionDenied
 from google.cloud import datacatalog_v1beta1
@@ -68,8 +69,8 @@ def test_create_tag_template_field(tag_template):
 
 
 def test_create_tag(table, tag_template):
-    entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{TEST_PROJECT_ID}'
-                                            f'/datasets/quickstart_test_dataset/tables/quickstart_test_table_2')
+    entry = datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
+                                            f'/datasets/{table.dataset_id}/tables/{table.table_id}')
 
     tag = datacatalog_helper.create_tag(
         entry=entry,
@@ -111,10 +112,10 @@ def test_create_tag(table, tag_template):
 
 def test_get_entry_success(table):
     results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'system=bigquery type=table name:quickstart_table_2')
+        TEST_ORGANIZATION_ID, f'system=bigquery type=table name:{table.table_id}')
 
-    table_resource_name = f'//bigquery.googleapis.com/projects/{TEST_PROJECT_ID}' \
-                          f'/datasets/data_catalog_quickstart/tables/quickstart_table_2'
+    table_resource_name = f'//bigquery.googleapis.com/projects/{table.project}'\
+                          f'/datasets/{table.dataset_id}/tables/{table.table_id}'
     table_search_result = next(result for result in results if result.linked_resource == table_resource_name)
 
     assert datacatalog_helper.get_entry(table_search_result.relative_resource_name)
@@ -122,73 +123,78 @@ def test_get_entry_success(table):
 
 def test_get_entry_failure_invalid_argument(table):
     try:
-        datacatalog_helper.lookup_entry(f'projects/{TEST_PROJECT_ID}/locations/US/entryGroups/@bigquery/entries/abc')
+        datacatalog_helper.lookup_entry(
+            f'projects/{table.project}/locations/US/entryGroups/@bigquery/entries/quickstart')
         assert False
     except InvalidArgument:
         assert True
 
 
 def test_lookup_entry_success(table):
-    assert datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{TEST_PROJECT_ID}'
-                                           f'/datasets/quickstart_test_dataset/tables/quickstart_test_table_2')
+    assert datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
+                                           f'/datasets/{table.dataset_id}/tables/{table.table_id}')
 
 
 def test_lookup_entry_failure_permission_denied(table):
     try:
-        datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{TEST_PROJECT_ID}'
-                                        f'/datasets/quickstart_test_dataset/tables/quickstart_test_table_20')
+        datacatalog_helper.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
+                                        f'/datasets/{table.dataset_id}/tables/quickstart')
         assert False
     except PermissionDenied:
         assert True
 
 
 def test_search_catalog_bigquery_dataset_with_results(dataset):
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:quickstart')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset')
     assert len(results) > 0
-    assert next(result for result in results if 'quickstart_test_dataset' in result.linked_resource)
+    assert next(result for result in results if dataset.dataset_id in result.linked_resource)
 
 
 def test_search_catalog_bigquery_dataset_with_no_results():
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:abc_xyz')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:quickstart')
     assert len(results) == 0
 
 
 def test_search_catalog_bigquery_table_column_with_results(table):
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'system=bigquery type=table column:email')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:email')
     assert len(results) > 0
-    assert next(result for result in results if 'quickstart_test_table_2' in result.linked_resource)
+    assert next(result for result in results if table.table_id in result.linked_resource)
 
 
 def test_search_catalog_bigquery_table_column_with_no_results():
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'system=bigquery type=table column:abc-xyz')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:quickstart')
     assert len(results) == 0
 
 
 def test_search_catalog_tag_template_with_results(tag):
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'tag:quickstart_test_tag_template')
+    entry_name = re.search('(.+?)/tags/(.+?)$', tag.name).group(1)
+    linked_resource = datacatalog_helper.get_entry(entry_name).linked_resource
+
+    template_id = re.search('(.+?)/tagTemplates/(.+?)$', tag.template).group(2)
+
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}')
+
     assert len(results) > 0
-    assert next(result for result in results if 'quickstart_test_table_2' in result.linked_resource)
+    assert next(result for result in results if linked_resource == result.linked_resource)
 
 
 def test_search_catalog_tag_template_with_no_results():
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'tag:quickstart_test_tag_template')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'tag:quickstart')
     assert len(results) == 0
 
 
 def test_search_catalog_tag_value_with_results(tag):
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'tag:quickstart_test_tag_template.double_field=10.5')
+    entry_name = re.search('(.+?)/tags/(.+?)$', tag.name).group(1)
+    linked_resource = datacatalog_helper.get_entry(entry_name).linked_resource
+
+    template_id = re.search('(.+?)/tagTemplates/(.+?)$', tag.template).group(2)
+
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}.double_field=10.5')
+    
     assert len(results) > 0
-    assert next(result for result in results if 'quickstart_test_table_2' in result.linked_resource)
+    assert next(result for result in results if linked_resource == result.linked_resource)
 
 
 def test_search_catalog_tag_value_with_no_results():
-    results = datacatalog_helper.search_catalog(
-        TEST_ORGANIZATION_ID, 'tag:quickstart_test_tag_template.double_field=10.5')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'tag:quickstart.double_field=10.5')
     assert len(results) == 0
