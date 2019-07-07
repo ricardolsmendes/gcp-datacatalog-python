@@ -151,7 +151,7 @@ def test_search_catalog_bigquery_dataset_with_results(dataset):
 
 
 def test_search_catalog_bigquery_dataset_with_no_results():
-    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:quickstart')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:abc_xyz')
     assert len(results) == 0
 
 
@@ -162,7 +162,7 @@ def test_search_catalog_bigquery_table_column_with_results(table):
 
 
 def test_search_catalog_bigquery_table_column_with_no_results():
-    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:quickstart')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:abc_xyz')
     assert len(results) == 0
 
 
@@ -179,7 +179,7 @@ def test_search_catalog_tag_template_with_results(tag):
 
 
 def test_search_catalog_tag_template_with_no_results():
-    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'tag:quickstart')
+    results = datacatalog_helper.search_catalog(TEST_ORGANIZATION_ID, 'tag:abc_xyz')
     assert len(results) == 0
 
 

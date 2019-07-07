@@ -1,6 +1,7 @@
 import os
 import pytest
 import time
+import uuid
 
 from google.api_core.exceptions import PermissionDenied
 from google.cloud import datacatalog_v1beta1
@@ -12,6 +13,12 @@ TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 datacatalog_client = datacatalog_v1beta1.DataCatalogClient()
 
 
+def __generate_uuid(length=5):
+    random = str(uuid.uuid4())  # Convert UUID format to a Python string
+    random = random.replace('-', '')  # Remove the '-' character
+    return random[0:length]  # Return the random string
+
+
 @pytest.fixture
 def tag_template(scope='function'):
     location = datacatalog_client.location_path(TEST_PROJECT_ID, 'us-central1')
@@ -19,7 +26,7 @@ def tag_template(scope='function'):
     # Delete a Tag Template with the same name if it already exists.
     try:
         datacatalog_client.delete_tag_template(
-            name=f'{location}/tagTemplates/quickstart_test_tag_template', force=True)
+            name=f'{location}/tagTemplates/{__generate_uuid()}_quickstart_test_tag_template', force=True)
     except PermissionDenied:
         pass
 
