@@ -12,11 +12,30 @@ Python code samples to help Data Citizens who work with Google Cloud Data Catalo
 
 ## 2. Environment setup
 
-Using *virtualenv* is optional, but strongly recommended.
+### 2.1. Get the code
 
-##### 2.1. Install Python 3.7
+````bash
+git clone https://github.com/ricardolsmendes/gcp-datacatalog-python.git
+cd gcp-datacatalog-python
+````
 
-##### 2.2. Create and activate a *virtualenv*
+### 2.2. Auth credentials
+
+##### 2.2.1. Create a service account and grant it below roles
+
+- BigQuery Admin
+- Data Catalog Admin
+
+##### 2.2.2. Download a JSON key and save it as
+- `./credentials/datacatalog-samples.json`
+
+### 2.3. Virtualenv
+
+Using *virtualenv* is optional, but strongly recommended unless you use Docker.
+
+##### 2.3.1. Install Python 3.7
+
+##### 2.3.2. Create and activate a *virtualenv*
 
 ```bash
 pip install --upgrade virtualenv
@@ -24,25 +43,25 @@ pip install --upgrade virtualenv
 source ./env/bin/activate
 ```
 
-##### 2.3. Install the dependencies
+##### 2.3.3. Install the dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install --upgrade -r requirements.txt
 ```
 
-##### 2.4. Setup credentials
+##### 2.3.4. Set environment variables
 
-###### 2.4.1. Create a service account and grant it below roles
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
+```
 
-- `BigQuery Admin`
-- `Data Catalog Admin`
+### 2.4. Docker
 
-###### 2.4.2. Download a JSON key and save it as
-- `./credentials/datacatalog-samples.json`
+See instructions below.
 
 ## 3. Quickstart
 
-##### 3.1. Automated tests
+### 3.1. Automated tests
 
 Automated tests are useful to make sure your environment has been properly set up.
 They communicate with GCP APIs and create temporary resources that are deleted just after being used.
@@ -50,7 +69,6 @@ They communicate with GCP APIs and create temporary resources that are deleted j
 - Virtualenv
 
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
 export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id
 export GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id
 
@@ -68,13 +86,11 @@ docker run \
   --rm gcp-datacatalog-python pytest ./tests/quickstart_test.py
 ```
 
-##### 3.2. Run quickstart.py
+### 3.2. Run quickstart.py
 
 - Virtualenv
 
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
-
 python quickstart.py your-organization-id your-project-id
 ```
 
