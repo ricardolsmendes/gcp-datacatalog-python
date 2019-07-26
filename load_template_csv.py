@@ -1,3 +1,8 @@
+"""
+This application demonstrates how to create a Tag Template in Data Catalog
+based on information retrieved from a CSV file.
+"""
+
 import argparse
 import csv
 import logging
@@ -18,6 +23,7 @@ Constants
 _CLOUD_PLATFORM_REGION = 'us-central1'
 
 _CUSTOM_MULTIVALUED_TYPE = 'MULTI'
+_DATA_CATALOG_BOOL_TYPE = 'BOOL'
 _DATA_CATALOG_ENUM_TYPE = 'ENUM'
 _DATA_CATALOG_NATIVE_TYPES = ['BOOL', 'DOUBLE', 'ENUM', 'STRING', 'TIMESTAMP']
 
@@ -90,7 +96,7 @@ class TemplateMaker:
         for attr in multivalued_attrs:
             try:
                 values_from_file = CSVFilesReader.read_helper(files_folder, stringcase.spinalcase(attr[0]))
-                attributes = [(StringFormatter.format_to_snakecase(value[0]), value[0], 'BOOL')
+                attributes = [(StringFormatter.format_to_snakecase(value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
                               for value in values_from_file]
             except FileNotFoundError:
                 logging.info('NOT FOUND. Ignoring...')
@@ -174,7 +180,7 @@ API communication classes
 
 class DataCatalogHelper:
     """
-    Manage Templates by communicating to Data Catalog's API
+    Manage Templates by communicating to Data Catalog's API.
     """
 
     def __init__(self):
@@ -210,11 +216,15 @@ class DataCatalogHelper:
     def delete_tag_template(self, name):
         """Delete a Tag Template."""
 
-        self.__datacatalog.delete_tag_template(name=name, force=True)
-
-        logging.info(f'===> Template deleted: {name}')
+        try:
+            self.__datacatalog.delete_tag_template(name=name, force=True)
+            logging.info(f'===> Template deleted: {name}')
+        except PermissionDenied:
+            pass
 
     def tag_template_exists(self, name):
+        """Check if a Tag Template with the provided name already exists."""
+
         try:
             self.__datacatalog.get_tag_template(name=name)
             return True
