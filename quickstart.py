@@ -1,5 +1,6 @@
-"""This application demonstrates how to perform basic operations with the
-Cloud Data Catalog API.
+"""
+This application demonstrates how to perform core operations with the
+Data Catalog API.
 
 For more information, see the README.md and the official documentation at
 https://cloud.google.com/data-catalog/docs.
