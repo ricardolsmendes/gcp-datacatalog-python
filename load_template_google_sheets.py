@@ -1,8 +1,7 @@
 """
-This application demonstrates how to create a Tag Template in Data Catalog
-based on information retrieved from Google Sheets.
+This application demonstrates how to create a Tag Template in Data Catalog,
+loading its information from Google Sheets.
 """
-
 import argparse
 import logging
 import re

@@ -1,8 +1,7 @@
 """
-This application demonstrates how to create a Tag Template in Data Catalog
-based on information retrieved from a CSV file.
+This application demonstrates how to create a Tag Template in Data Catalog,
+loading its information from a CSV file.
 """
-
 import argparse
 import csv
 import logging
