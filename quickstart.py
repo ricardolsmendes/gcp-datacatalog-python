@@ -135,6 +135,10 @@ class DataCatalogHelper:
             self.__datacatalog.search_catalog(scope=scope, query=query))
 
 
+"""
+Main program entry point
+========================================
+"""
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -190,8 +194,9 @@ if __name__ == '__main__':
     # ================================================================================
     # Delete a Tag Template with the same name if it already exists.
     try:
-        datacatalog_helper.delete_tag_template(f'projects/{args.project_id}/locations/us-central1/'
-                                               f'tagTemplates/quickstart_classification_template')
+        datacatalog_helper.delete_tag_template(
+            datacatalog_v1beta1.DataCatalogClient.tag_template_path(
+                project=args.project_id, location='us-central1', tag_template='quickstart_classification_template'))
     except PermissionDenied:
         pass
 
