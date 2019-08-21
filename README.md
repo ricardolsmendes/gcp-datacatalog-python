@@ -78,8 +78,7 @@ pytest ./tests/quickstart_test.py
 - Or using Docker
 
 ```bash
-cd..
-docker build --rm --tag gcp-datacatalog-python ./gcp-datacatalog-python/
+docker build --rm --tag gcp-datacatalog-python .
 docker run \
   --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id \
@@ -97,10 +96,10 @@ python quickstart.py your-organization-id your-project-id
 - Or using Docker
 
 ```bash
-cd..
-docker build --rm --tag gcp-datacatalog-python ./gcp-datacatalog-python/
+docker build --rm --tag gcp-datacatalog-python .
 docker run --rm gcp-datacatalog-python python quickstart.py your-organization-id your-project-id
 ```
+
 ## 4. Load Tag Templates from CSV files
 
 ### 4.1. Provide CSV files representing the Template to be created
