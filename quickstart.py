@@ -145,8 +145,8 @@ if __name__ == '__main__':
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('organization_id', help='Your Google Cloud organization ID')
-    parser.add_argument('project_id', help='Your Google Cloud project ID')
+    parser.add_argument('--organization-id', help='Your Google Cloud organization ID', required=True)
+    parser.add_argument('--project-id', help='Your Google Cloud project ID', required=True)
 
     args = parser.parse_args()
 

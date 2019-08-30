@@ -284,10 +284,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Load Tag Template from CSV')
 
-    parser.add_argument('template_id', help='the template ID')
-    parser.add_argument('display_name', help='template\'s Display Name')
-    parser.add_argument('project_id', help='GCP Project in which Template will be created')
-    parser.add_argument('spreadsheet_id', help='Google Spreadsheet ID')
+    parser.add_argument('--template-id', help='the template ID', required=True)
+    parser.add_argument('--display-name', help='template\'s Display Name', required=True)
+    parser.add_argument('--project-id', help='GCP Project in which the Template will be created', required=True)
+    parser.add_argument('--spreadsheet-id', help='Google Spreadsheet ID', required=True)
     parser.add_argument('--delete-existing', action='store_true',
                         help='delete existing Templates and recreate them with the provided metadata')
 

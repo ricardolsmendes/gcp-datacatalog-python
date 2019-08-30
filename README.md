@@ -39,7 +39,7 @@ Using *virtualenv* is optional, but strongly recommended unless you use Docker.
 
 ```bash
 pip install --upgrade virtualenv
-[python3 -m] virtualenv --python python3 env
+python3 -m virtualenv --python python3 env
 source ./env/bin/activate
 ```
 
@@ -90,14 +90,14 @@ docker run \
 - Virtualenv
 
 ```bash
-python quickstart.py your-organization-id your-project-id
+python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```
 
 - Or using Docker
 
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
-docker run --rm gcp-datacatalog-python python quickstart.py your-organization-id your-project-id
+docker run --rm gcp-datacatalog-python python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```
 
 ## 4. Load Tag Templates from CSV files
