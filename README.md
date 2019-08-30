@@ -1,6 +1,13 @@
 # gcp-datacatalog-python
 
-Python code samples to help Data Citizens who work with Google Cloud Data Catalog.
+Self-contained ready-to-use Python scripts to help Data Citizens who work with Google Cloud Data Catalog.
+
+- [Quickstart](#3-quickstart): sample code for Data Catalog's API core features.
+
+- [Load Tag Templates from CSV files](#4-load-tag-templates-from-csv-files): loads a set of fields from **CSV files** and creates Tag Templates using them.
+
+- [Load Tag Templates from Google Sheets](#5-load-tag-templates-from-google-sheets): loads a set of fields from **Google Sheets** and creates Tag Templates using them.
+
 
 ## 1. Understand the concepts behind this code
 
