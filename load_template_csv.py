@@ -38,8 +38,8 @@ Template maker
 
 class TemplateMaker:
 
-    @staticmethod
-    def __filter_attributes_by_types(attributes, types):
+    @classmethod
+    def __filter_attributes_by_types(cls, attributes, types):
         filtered_attributes = []
         for attribute in attributes:
             if attribute[2] in types:
@@ -61,7 +61,7 @@ class TemplateMaker:
     def __process_native_attributes(self, files_folder, project_id, template_id, display_name,
                                     master_template_attributes, delete_existing_template):
 
-        native_attrs = TemplateMaker.__filter_attributes_by_types(
+        native_attrs = self.__filter_attributes_by_types(
             master_template_attributes, _DATA_CATALOG_NATIVE_TYPES)
 
         StringFormatter.format_elements_to_snakecase(native_attrs, 0)
@@ -87,7 +87,7 @@ class TemplateMaker:
     def __process_custom_multivalued_attributes(self, files_folder, project_id, template_id, display_name,
                                                 master_template_attributes, delete_existing_template):
 
-        multivalued_attrs = TemplateMaker.__filter_attributes_by_types(
+        multivalued_attrs = self.__filter_attributes_by_types(
             master_template_attributes, [_CUSTOM_MULTIVALUED_TYPE])
 
         StringFormatter.format_elements_to_snakecase(multivalued_attrs, 0)

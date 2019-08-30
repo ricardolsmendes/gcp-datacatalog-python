@@ -13,43 +13,43 @@ from google.cloud import datacatalog_v1beta1
 
 class DataCatalogHelper:
 
-    @staticmethod
-    def __fetch_search_results(results_pages_iterator):
+    @classmethod
+    def __fetch_search_results(cls, results_pages_iterator):
         return [result for result in results_pages_iterator]
 
-    @staticmethod
-    def __set_tag_field_value(field, value, primitive_type=None):
+    @classmethod
+    def __set_tag_field_value(cls, field, value, primitive_type=None):
         set_primitive_field_value_functions = {
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL: DataCatalogHelper.__set_bool_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE: DataCatalogHelper.__set_double_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING: DataCatalogHelper.__set_string_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP: DataCatalogHelper.__set_timestamp_field_value
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
+            datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
         }
 
         if primitive_type:
             set_primitive_field_value = set_primitive_field_value_functions[primitive_type]
             set_primitive_field_value(field, value)
         else:
-            DataCatalogHelper.__set_enum_field_value(field, value)
+            cls.__set_enum_field_value(field, value)
 
-    @staticmethod
-    def __set_bool_field_value(field, value):
+    @classmethod
+    def __set_bool_field_value(cls, field, value):
         field.bool_value = value
 
-    @staticmethod
-    def __set_double_field_value(field, value):
+    @classmethod
+    def __set_double_field_value(cls, field, value):
         field.double_value = value
 
-    @staticmethod
-    def __set_enum_field_value(field, value):
+    @classmethod
+    def __set_enum_field_value(cls, field, value):
         field.enum_value.display_name = value
 
-    @staticmethod
-    def __set_string_field_value(field, value):
+    @classmethod
+    def __set_string_field_value(cls, field, value):
         field.string_value = value
 
-    @staticmethod
-    def __set_timestamp_field_value(field, value_as_string):
+    @classmethod
+    def __set_timestamp_field_value(cls, field, value_as_string):
         field.timestamp_value.FromJsonString(value_as_string)
 
     def __init__(self):
@@ -105,7 +105,7 @@ class DataCatalogHelper:
         tag.template = tag_template.name
 
         for descriptor in fields_descriptors:
-            DataCatalogHelper.__set_tag_field_value(
+            self.__set_tag_field_value(
                 tag.fields[descriptor['id']], descriptor['value'], descriptor['primitive_type'])
 
         return self.__datacatalog.create_tag(parent=entry.name, tag=tag)
@@ -131,8 +131,7 @@ class DataCatalogHelper:
         scope = datacatalog_v1beta1.types.SearchCatalogRequest.Scope()
         scope.include_org_ids.append(organization_id)
 
-        return DataCatalogHelper.__fetch_search_results(
-            self.__datacatalog.search_catalog(scope=scope, query=query))
+        return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
 
 
 """
