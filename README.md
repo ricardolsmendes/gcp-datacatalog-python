@@ -104,7 +104,8 @@ python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
-docker run --rm --tty gcp-datacatalog-python python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
+docker run \
+  --rm --tty gcp-datacatalog-python python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```
 
 ## 4. Load Tag Templates from CSV files

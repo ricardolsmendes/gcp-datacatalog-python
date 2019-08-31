@@ -188,12 +188,12 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     try:
         datacatalog_helper.delete_tag_template(
             datacatalog_v1beta1.DataCatalogClient.tag_template_path(
-                project=args.project_id, location='us-central1', tag_template='quickstart_classification_template'))
+                project=project_id, location='us-central1', tag_template='quickstart_classification_template'))
     except PermissionDenied:
         pass
 
     template = datacatalog_helper.create_tag_template(
-        project_id=args.project_id,
+        project_id=project_id,
         template_id='quickstart_classification_template',
         display_name='A Tag Template to be used in the hands-on guide',
         primitive_fields_descriptors=[
@@ -266,7 +266,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # 9. Search for assets tagged with the tag template.
     # ================================================================================
     tag_template_search_results = datacatalog_helper.search_catalog(
-        args.organization_id, 'tag:quickstart_classification_template')
+        organization_id, 'tag:quickstart_classification_template')
 
     print(tag_template_search_results)
 
@@ -274,7 +274,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # 10. Search for assets tagged with a given value.
     # ================================================================================
     tag_value_search_results = datacatalog_helper.search_catalog(
-        args.organization_id, 'tag:quickstart_classification_template.has_pii=True')
+        organization_id, 'tag:quickstart_classification_template.has_pii=True')
 
     print(tag_value_search_results)
 
@@ -289,8 +289,8 @@ if __name__ == '__main__':
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('--organization-id', help='Your Google Cloud organization ID', required=True)
-    parser.add_argument('--project-id', help='Your Google Cloud project ID', required=True)
+    parser.add_argument('--organization-id', help='Google Cloud Organization ID', required=True)
+    parser.add_argument('--project-id', help='Google Cloud Project ID', required=True)
 
     args = parser.parse_args()
 
