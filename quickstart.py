@@ -1,9 +1,16 @@
 """
-This application demonstrates how to perform core operations with the
-Data Catalog API.
+This application demonstrates how to perform core operations with the Data Catalog API.
 
-For more information, see the README.md and the official documentation at
-https://cloud.google.com/data-catalog/docs.
+Before using it, make sure the Google Cloud Project contains below BigQuery assets:
+- datacatalog_quickstart [dataset]
+    + table_1 [table]
+    - table_2 [table]
+        - name: STRING [column]
+        - email: STRING [column]
+
+Please refer to
+https://medium.com/google-cloud/data-catalog-hands-on-guide-search-get-lookup-with-python-82d99bfb4056
+for further details.
 """
 import argparse
 
@@ -134,28 +141,14 @@ class DataCatalogHelper:
         return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
 
 
-"""
-Main program entry point
-========================================
-"""
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-
-    parser.add_argument('--organization-id', help='Your Google Cloud organization ID', required=True)
-    parser.add_argument('--project-id', help='Your Google Cloud project ID', required=True)
-
-    args = parser.parse_args()
-
+def __show_datacatalog_api_core_features(organization_id, project_id):
     datacatalog_helper = DataCatalogHelper()
 
     # ================================================================================
     # 1. Search for BigQuery Datasets.
     # ================================================================================
     bq_datasets_search_results = datacatalog_helper.search_catalog(
-        args.organization_id, 'system=bigquery type=dataset quickstart')
+        organization_id, 'system=bigquery type=dataset quickstart')
 
     print(bq_datasets_search_results)
 
@@ -163,15 +156,15 @@ if __name__ == '__main__':
     # 2. Search for assets having the 'email' word in their columns metadata.
     # ================================================================================
     bq_tables_column_search_results = datacatalog_helper.search_catalog(
-        args.organization_id, 'column:email')
+        organization_id, 'column:email')
 
     print(bq_tables_column_search_results)
 
     # ================================================================================
-    # 3. Get the catalog entry for quickstart_table_2 based on search results.
+    # 3. Get the catalog entry for table_2 based on search results.
     # ================================================================================
-    table_2_resource_name = f'//bigquery.googleapis.com/projects/{args.project_id}'\
-                            f'/datasets/data_catalog_quickstart/tables/quickstart_table_2'
+    table_2_resource_name = f'//bigquery.googleapis.com/projects/{project_id}'\
+                            f'/datasets/datacatalog_quickstart/tables/table_2'
     table_2_search_result = next(result for result in bq_tables_column_search_results
                                  if result.linked_resource == table_2_resource_name)
 
@@ -180,10 +173,10 @@ if __name__ == '__main__':
     print(table_2_entry)
 
     # ================================================================================
-    # 4. Lookup the catalog entry for quickstart_table_1.
+    # 4. Lookup the catalog entry for table_1.
     # ================================================================================
-    table_1_resource_name = f'//bigquery.googleapis.com/projects/{args.project_id}' \
-                            f'/datasets/data_catalog_quickstart/tables/quickstart_table_1'
+    table_1_resource_name = f'//bigquery.googleapis.com/projects/{project_id}' \
+                            f'/datasets/datacatalog_quickstart/tables/table_1'
     table_1_entry = datacatalog_helper.lookup_entry(table_1_resource_name)
 
     print(table_1_entry)
@@ -231,7 +224,7 @@ if __name__ == '__main__':
     print(template)
 
     # ================================================================================
-    # 7. Create a tag to quickstart_table_1 catalog entry.
+    # 7. Create a tag to table_1 catalog entry.
     # ================================================================================
     tag_entry_table_1 = datacatalog_helper.create_tag(
         entry=table_1_entry,
@@ -248,7 +241,7 @@ if __name__ == '__main__':
     print(tag_entry_table_1)
 
     # ================================================================================
-    # 8. Create a tag to quickstart_table_2 catalog entry.
+    # 8. Create a tag to table_2 catalog entry.
     # ================================================================================
     tag_entry_table_2 = datacatalog_helper.create_tag(
         entry=table_2_entry,
@@ -284,3 +277,21 @@ if __name__ == '__main__':
         args.organization_id, 'tag:quickstart_classification_template.has_pii=True')
 
     print(tag_value_search_results)
+
+
+"""
+Main program entry point
+========================================
+"""
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    parser.add_argument('--organization-id', help='Your Google Cloud organization ID', required=True)
+    parser.add_argument('--project-id', help='Your Google Cloud project ID', required=True)
+
+    args = parser.parse_args()
+
+    __show_datacatalog_api_core_features(args.organization_id, args.project_id)
