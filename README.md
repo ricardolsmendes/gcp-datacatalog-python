@@ -68,31 +68,7 @@ See instructions below.
 
 ## 3. Quickstart
 
-### 3.1. Automated tests
-
-Automated tests are useful to make sure your environment has been properly set up.
-They communicate with GCP APIs and create temporary resources that are deleted just after being used.
-
-- Virtualenv
-
-```bash
-export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id
-export GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id
-
-pytest ./tests/quickstart_test.py
-```
-
-- Or using Docker
-
-```bash
-docker build --rm --tag gcp-datacatalog-python .
-docker run \
-  --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id \
-  --env GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id \
-  --rm gcp-datacatalog-python pytest ./tests/quickstart_test.py
-```
-
-### 3.2. Run quickstart.py
+### 3.1. Run quickstart.py
 
 - Virtualenv
 
@@ -105,6 +81,30 @@ python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm gcp-datacatalog-python python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
+```
+
+### 3.2. End-to-end tests
+
+Ent-to-end tests may help you to make sure your environment has been properly set up.
+They actually communicate with GCP APIs and create temporary resources that are deleted just after being used.
+
+- Virtualenv
+
+```bash
+export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id
+export GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id
+
+pytest ./tests_e2e/quickstart_test.py
+```
+
+- Or using Docker
+
+```bash
+docker build --rm --tag gcp-datacatalog-python .
+docker run \
+  --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=your-organization-id \
+  --env GOOGLE_CLOUD_TEST_PROJECT_ID=your-project-id \
+  --rm gcp-datacatalog-python pytest ./tests_e2e/quickstart_test.py
 ```
 
 ## 4. Load Tag Templates from CSV files

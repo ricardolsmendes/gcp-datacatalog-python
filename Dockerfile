@@ -11,3 +11,6 @@ RUN pip install -r requirements.txt
 
 # Copy project files (see .dockerignore).
 COPY . .
+
+# Run the unit tests.
+RUN pytest ./tests --cov --cov-report term-missing
