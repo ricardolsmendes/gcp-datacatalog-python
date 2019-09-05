@@ -79,7 +79,7 @@ They actually communicate with the APIs and create temporary resources that are 
 export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID
 export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
 
-pytest ./tests_e2e/quickstart_test.py
+pytest tests_e2e/quickstart_test.py
 ```
 
 - Or using Docker
