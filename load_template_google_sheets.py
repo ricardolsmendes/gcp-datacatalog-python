@@ -39,15 +39,6 @@ Template maker
 
 class TemplateMaker:
 
-    @classmethod
-    def __filter_attributes_by_types(cls, attributes, types):
-        filtered_attributes = []
-        for attribute in attributes:
-            if attribute[2] in types:
-                filtered_attributes.append(attribute)
-
-        return filtered_attributes
-
     def __init__(self):
         self.__sheets_reader = GoogleSheetsReader()
         self.__datacatalog_helper = DataCatalogHelper()
@@ -118,6 +109,10 @@ class TemplateMaker:
             if not self.__datacatalog_helper.tag_template_exists(template_name):
                 self.__datacatalog_helper.create_tag_template(
                     project_id, custom_template_id, custom_display_name, attributes)
+
+    @classmethod
+    def __filter_attributes_by_types(cls, attributes, types):
+        return [attribute for attribute in attributes if attribute[2] in types]
 
 
 """

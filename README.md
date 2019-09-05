@@ -89,7 +89,8 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run \
   --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
-  --rm --tty gcp-datacatalog-python pytest ./tests_e2e/quickstart_test.py
+  --rm --tty gcp-datacatalog-python \
+  pytest tests_e2e/quickstart_test.py
 ```
 
 ### 3.2. Run quickstart.py
@@ -105,7 +106,8 @@ python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run \
-  --rm --tty gcp-datacatalog-python python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
+  --rm --tty gcp-datacatalog-python \
+  python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 ```
 
 ## 4. Load Tag Templates from CSV files
