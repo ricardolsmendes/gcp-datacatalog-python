@@ -4,13 +4,12 @@ from google.cloud import datacatalog_v1beta1
 
 from load_template_csv import TemplateMaker
 
-TEST_FILES_FOLDER = os.environ['INPUT_FILES_FOLDER']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
 
 def test_tempate_maker_run():
     TemplateMaker().run(
-        files_folder=TEST_FILES_FOLDER,
+        files_folder=f'{os.getcwd()}/sample-input/load-template-csv',
         project_id=TEST_PROJECT_ID,
         template_id='template_abc',
         display_name='Testing Load Tag Templates from CSV files',
