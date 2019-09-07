@@ -12,6 +12,7 @@ from .datacatalog import table_entry, tag, tag_template
 TEST_ORGANIZATION_ID = os.environ['GOOGLE_CLOUD_TEST_ORGANIZATION_ID']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
+datacatalog = datacatalog_v1beta1.DataCatalogClient()
 datacatalog_helper = DataCatalogHelper()
 
 
@@ -47,7 +48,7 @@ def test_datacatalog_helper_create_tag_template():
     assert template.name == f'projects/{TEST_PROJECT_ID}/locations/us-central1/tagTemplates/quickstart_test_template'
 
     # Clean up.
-    datacatalog_helper.delete_tag_template(template.name)
+    datacatalog.delete_tag_template(name=template.name, force=True)
 
 
 def test_datacatalog_helper_create_tag_template_field(tag_template):
@@ -64,8 +65,8 @@ def test_datacatalog_helper_create_tag_template_field(tag_template):
     assert field.type.enum_type
 
     # Clean up.
-    datacatalog_helper.delete_tag_template_field(
-        name=f'{tag_template.name}/fields/quickstart_test_tag_template_enum_field')
+    datacatalog.delete_tag_template_field(
+        name=f'{tag_template.name}/fields/quickstart_test_tag_template_enum_field', force=True)
 
 
 def test_datacatalog_helper_create_tag(table, tag_template):
@@ -107,7 +108,7 @@ def test_datacatalog_helper_create_tag(table, tag_template):
     assert entry.name in tag.name
 
     # Clean up.
-    datacatalog_helper.delete_tag(tag.name)
+    datacatalog.delete_tag(name=tag.name)
 
 
 def test_datacatalog_helper_get_entry(table):
@@ -118,7 +119,7 @@ def test_datacatalog_helper_get_entry(table):
                           f'/datasets/{table.dataset_id}/tables/{table.table_id}'
     table_search_result = next(result for result in results if result.linked_resource == table_resource_name)
 
-    assert datacatalog_helper.get_entry(table_search_result.relative_resource_name)
+    assert datacatalog.get_entry(name=table_search_result.relative_resource_name)
 
 
 def test_datacatalog_helper_get_entry_fail_invalid_argument(table):
