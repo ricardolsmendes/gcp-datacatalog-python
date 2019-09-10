@@ -38,6 +38,16 @@ class DataCatalogHelperTest(TestCase):
 
 class StringFormatterTest(TestCase):
 
+    def test_format_elements_snakecase_list(self):
+        test_list = ['AA-AA', 'BB-BB']
+        StringFormatter.format_elements_to_snakecase(test_list)
+        self.assertListEqual(['aa_aa', 'bb_bb'], test_list)
+
+    def test_format_elements_snakecase_internal_index(self):
+        test_list = [['AA-AA', 'Test A'], ['BB-BB', 'Test B']]
+        StringFormatter.format_elements_to_snakecase(test_list, internal_index=0)
+        self.assertListEqual([['aa_aa', 'Test A'], ['bb_bb', 'Test B']], test_list)
+
     def test_format_string_to_snakecase_abbreviation(self):
         self.assertEqual('aaa', StringFormatter.format_to_snakecase('AAA'))
         self.assertEqual('aaa_aaa', StringFormatter.format_to_snakecase('AAA-AAA'))
