@@ -162,7 +162,11 @@ docker run \
 
 ## 5. Load Tag Templates from Google Sheets
 
-### 5.1. Provide Google Spreadsheets representing the Template to be created
+### 5.1. Enable the Google Sheets API in your GCP Project
+
+https://console.developers.google.com/apis/library/sheets.googleapis.com?project=<PROJECT_ID>
+
+### 5.2. Provide Google Spreadsheets representing the Template to be created
 
 1. A **master sheet** named with the Template ID — i.e., `template-abc` if your Template ID is *template-abc*. This sheet may contain as many lines as needed to represent the template. The first line is always discarded as it's supposed to contain headers. Each field line must have 3 values: column A is the Field ID; column B is its Display Name; column C is the Type. Currently, types `BOOL`, `DOUBLE`, `ENUM`, `STRING`, `TIMESTAMP`, and `MULTI` are supported. *`MULTI` is not a Data Catalog native type, but a flag that instructs the script to create a specific template to represent field's predefined values (more on this below...)*.  
 1. If the template has **ENUM fields**, the script looks for a "display names sheet" for each of them. The sheets shall be named with the fields' names — i.e., `enum-field-xyz` if an ENUM Field ID is *enum_field_xyz*. Each sheet must have just one value per line (column A), representing a display name.
