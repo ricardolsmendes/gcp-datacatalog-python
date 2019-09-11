@@ -5,30 +5,45 @@ from google.api_core.exceptions import PermissionDenied
 
 from load_template_google_sheets import DataCatalogHelper, StringFormatter
 
-_LOOKED_UP_DATACATALOG_CLIENT = 'load_template_google_sheets.datacatalog_v1beta1.DataCatalogClient'
+_PATCHED_DATACATALOG_CLIENT = 'load_template_google_sheets.datacatalog_v1beta1.DataCatalogClient'
 
 
-@patch(f'{_LOOKED_UP_DATACATALOG_CLIENT}.__init__', lambda self, *args: None)
+@patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self, *args: None)
 class DataCatalogHelperTest(TestCase):
 
-    @patch(f'{_LOOKED_UP_DATACATALOG_CLIENT}.delete_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')
+    def test_create_tag_template_should_create_with_fields(self, mock_create_tag_template):
+        DataCatalogHelper().create_tag_template(
+            project_id=None,
+            template_id=None,
+            display_name='Test Display Name',
+            fields_descriptors=[
+                ['test-string-field-id', 'Test String Field Display Name', 'STRING'],
+                ['test-enum-field-id', 'Test ENUM Field Display Name', 'ENUM']
+            ],
+            enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']}
+        )
+
+        mock_create_tag_template.assert_called_once()
+
+    @patch(f'{_PATCHED_DATACATALOG_CLIENT}.delete_tag_template')
     def test_delete_tag_template_should_call_client_library_method(self, mock_delete_tag_template):
         DataCatalogHelper().delete_tag_template(None)
         mock_delete_tag_template.assert_called_once()
 
-    @patch(f'{_LOOKED_UP_DATACATALOG_CLIENT}.delete_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_CLIENT}.delete_tag_template')
     def test_delete_tag_template_should_succeed_nonexistent(self, mock_delete_tag_template):
         mock_delete_tag_template.side_effect = PermissionDenied(message='')
         DataCatalogHelper().delete_tag_template(None)
         mock_delete_tag_template.assert_called_once()
 
-    @patch(f'{_LOOKED_UP_DATACATALOG_CLIENT}.get_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_CLIENT}.get_tag_template')
     def test_tag_template_exists_should_return_true_existing(self, mock_get_tag_template):
         tag_template_exists = DataCatalogHelper().tag_template_exists(None)
         self.assertTrue(tag_template_exists)
         mock_get_tag_template.assert_called_once()
 
-    @patch(f'{_LOOKED_UP_DATACATALOG_CLIENT}.get_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_CLIENT}.get_tag_template')
     def test_tag_template_exists_should_return_false_nonexistent(self, mock_get_tag_template):
         mock_get_tag_template.side_effect = PermissionDenied(message='')
         tag_template_exists = DataCatalogHelper().tag_template_exists(None)

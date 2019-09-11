@@ -184,7 +184,7 @@ class DataCatalogHelper:
     def create_tag_template(self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
         """Create a Tag Template."""
 
-        location = self.__datacatalog.location_path(project_id, _CLOUD_PLATFORM_REGION)
+        location = datacatalog_v1beta1.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
 
         tag_template = datacatalog_v1beta1.types.TagTemplate()
         tag_template.display_name = display_name
