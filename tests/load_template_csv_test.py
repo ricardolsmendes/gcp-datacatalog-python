@@ -12,7 +12,7 @@ _PATCHED_DATACATALOG_CLIENT = 'load_template_csv.datacatalog_v1beta1.DataCatalog
 class DataCatalogHelperTest(TestCase):
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')
-    def test_create_tag_template_should_create_with_fields(self, mock_create_tag_template):
+    def test_create_tag_template_should_handle_provided_fields(self, mock_create_tag_template):
         DataCatalogHelper().create_tag_template(
             project_id=None,
             template_id=None,
@@ -32,7 +32,7 @@ class DataCatalogHelperTest(TestCase):
         mock_delete_tag_template.assert_called_once()
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.delete_tag_template')
-    def test_delete_tag_template_should_succeed_nonexistent(self, mock_delete_tag_template):
+    def test_delete_tag_template_should_handle_nonexistent(self, mock_delete_tag_template):
         mock_delete_tag_template.side_effect = PermissionDenied(message='')
         DataCatalogHelper().delete_tag_template(None)
         mock_delete_tag_template.assert_called_once()
