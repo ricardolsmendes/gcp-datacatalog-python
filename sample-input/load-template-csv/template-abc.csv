@@ -1,8 +1,8 @@
 ID,Display name,Type
-booleanAttribute1,Boolean attribute 1,BOOL
-booleanAttribute2,Boolean attribute 2,BOOL
-doubleAttribute,Double attribute,DOUBLE
-enumAttributeXyz,ENUM attribute XYZ,ENUM
-multivaluedAttributeIgnored,Multivalued attribute to be ignored (no values file),MULTI
-multivaluedAttributeXyz,Multivalued attribute XYZ,MULTI
-stringAttribute,String attribute,STRING
+booleanField1,Boolean field 1,BOOL
+booleanField2,Boolean field 2,BOOL
+doubleField,Double field,DOUBLE
+enumFieldXyz,ENUM field XYZ,ENUM
+multivaluedFieldIgnored,Multivalued field to be ignored (no values file),MULTI
+multivaluedFieldXyz,Multivalued field XYZ,MULTI
+stringField,String field,STRING
