@@ -17,13 +17,13 @@ def test_tempate_maker_run():
 
     location_name = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
     main_template_name = f'{location_name}/tagTemplates/template_abc'
-    multivalued_attr_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_attribute_xyz'
+    multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
     datacatalog = datacatalog_v1beta1.DataCatalogClient()
 
     assert datacatalog.get_tag_template(name=main_template_name)
-    assert datacatalog.get_tag_template(name=multivalued_attr_template_name)
+    assert datacatalog.get_tag_template(name=multivalued_field_template_name)
 
     # Clean up.
     datacatalog.delete_tag_template(name=main_template_name, force=True)
-    datacatalog.delete_tag_template(name=multivalued_attr_template_name, force=True)
+    datacatalog.delete_tag_template(name=multivalued_field_template_name, force=True)

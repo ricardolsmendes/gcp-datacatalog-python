@@ -4,9 +4,116 @@ from unittest.mock import mock_open, patch
 
 from google.api_core.exceptions import PermissionDenied
 
-from load_template_csv import CSVFilesReader, DataCatalogHelper, StringFormatter
+from load_template_csv import CSVFilesReader, DataCatalogHelper, StringFormatter, TemplateMaker
 
 _PATCHED_DATACATALOG_CLIENT = 'load_template_csv.datacatalog_v1beta1.DataCatalogClient'
+_PATCHED_DATACATALOG_HELPER = 'load_template_csv.DataCatalogHelper'
+
+
+@patch(f'{_PATCHED_DATACATALOG_HELPER}.__init__', lambda self, *args: None)
+class TemplateMakerTest(TestCase):
+
+    def test_constructor_should_set_instance_attributes(self):
+        self.assertIsNotNone(TemplateMaker().__dict__['_TemplateMaker__datacatalog_helper'])
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists')
+    @patch('load_template_csv.CSVFilesReader.read_master')
+    def test_run_should_create_master_template_with_primitive_fields(
+            self, mock_read_master, mock_tag_template_exists, mock_create_tag_template):
+
+        mock_read_master.return_value = [['val1', 'val2', 'BOOL']]
+        mock_tag_template_exists.return_value = False
+
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template')
+
+        mock_read_master.assert_called_once()
+        mock_tag_template_exists.assert_called_once()
+        mock_create_tag_template.assert_called_once()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch('load_template_csv.CSVFilesReader.read_helper')
+    @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'ENUM']])
+    def test_run_should_create_master_template_with_enum_fields(self, mock_read_helper):
+        mock_read_helper.return_value = [['helper_val1']]
+
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template')
+
+        mock_read_helper.assert_called_once()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template', lambda self, *args: None)
+    @patch('load_template_csv.CSVFilesReader.read_helper')
+    @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'MULTI']])
+    def test_run_should_create_helper_template_for_multivalued_fields(
+            self, mock_read_helper, mock_create_tag_template):
+
+        mock_read_helper.return_value = [['helper_val1']]
+
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template',
+            delete_existing=True)
+
+        mock_read_helper.assert_called_once()
+        self.assertEqual(2, mock_create_tag_template.call_count)  # Create the master and helper Templates.
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch('load_template_csv.CSVFilesReader.read_helper')
+    @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'MULTI']])
+    def test_run_should_ignore_template_for_multivalued_fields_if_file_not_found(
+            self, mock_read_helper, mock_create_tag_template):
+
+        mock_read_helper.side_effect = FileNotFoundError()
+
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template')
+
+        mock_read_helper.assert_called_once()
+        mock_create_tag_template.assert_called_once()  # Create only the master Template.
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template')
+    @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'BOOL']])
+    def test_run_should_not_delete_existing_template_by_default(self, mock_delete_tag_template):
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template')
+
+        mock_delete_tag_template.assert_not_called()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template')
+    @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'BOOL']])
+    def test_run_should_delete_existing_template_if_flag_set(self, mock_delete_tag_template):
+        TemplateMaker().run(
+            files_folder=None,
+            project_id=None,
+            template_id='test-template-id',
+            display_name='Test Template',
+            delete_existing=True)
+
+        mock_delete_tag_template.assert_called_once()
 
 
 class CSVFilesReaderTest(TestCase):
@@ -64,7 +171,7 @@ class CSVFilesReaderTest(TestCase):
 class DataCatalogHelperTest(TestCase):
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')
-    def test_create_tag_template_should_handle_provided_fields(self, mock_create_tag_template):
+    def test_create_tag_template_should_handle_described_fields(self, mock_create_tag_template):
         DataCatalogHelper().create_tag_template(
             project_id=None,
             template_id=None,

@@ -28,7 +28,7 @@ _DATA_CATALOG_BOOL_TYPE = 'BOOL'
 _DATA_CATALOG_ENUM_TYPE = 'ENUM'
 _DATA_CATALOG_NATIVE_TYPES = ['BOOL', 'DOUBLE', 'ENUM', 'STRING', 'TIMESTAMP']
 
-_LOOKING_FOR_SHEET_FORMAT = 'Looking for {} sheet {} | {}...'
+_LOOKING_FOR_SHEET_LOG_FORMAT = 'Looking for {} sheet {} | {}...'
 
 
 """
@@ -44,28 +44,25 @@ class TemplateMaker:
         self.__datacatalog_helper = DataCatalogHelper()
 
     def run(self, spreadsheet_id, project_id, template_id, display_name, delete_existing=False):
-        master_template_attributes = self.__sheets_reader.read_master(spreadsheet_id,
-                                                                      stringcase.spinalcase(template_id))
-        self.__process_native_attributes(spreadsheet_id, project_id, template_id, display_name,
-                                         master_template_attributes, delete_existing)
-        self.__process_custom_multivalued_attributes(spreadsheet_id, project_id, template_id, display_name,
-                                                     master_template_attributes, delete_existing)
+        master_template_fields = self.__sheets_reader.read_master(spreadsheet_id, stringcase.spinalcase(template_id))
+        self.__process_native_fields(spreadsheet_id, project_id, template_id, display_name,
+                                     master_template_fields, delete_existing)
+        self.__process_custom_multivalued_fields(spreadsheet_id, project_id, template_id, display_name,
+                                                 master_template_fields, delete_existing)
 
-    def __process_native_attributes(self, spreadsheet_id, project_id, template_id, display_name,
-                                    master_template_attributes, delete_existing_template):
+    def __process_native_fields(self, spreadsheet_id, project_id, template_id, display_name,
+                                master_template_fields, delete_existing_template):
 
-        native_attrs = self.__filter_attributes_by_types(
-            master_template_attributes, _DATA_CATALOG_NATIVE_TYPES)
-
-        StringFormatter.format_elements_to_snakecase(native_attrs, 0)
+        native_fields = self.__filter_fields_by_types(master_template_fields, _DATA_CATALOG_NATIVE_TYPES)
+        StringFormatter.format_elements_to_snakecase(native_fields, 0)
 
         enums_names = {}
-        for attr in native_attrs:
-            if not attr[2] == _DATA_CATALOG_ENUM_TYPE:
+        for field in native_fields:
+            if not field[2] == _DATA_CATALOG_ENUM_TYPE:
                 continue
 
-            names_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(attr[0]))
-            enums_names[attr[0]] = [name[0] for name in names_from_sheet]
+            names_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(field[0]))
+            enums_names[field[0]] = [name[0] for name in names_from_sheet]
 
         template_name = datacatalog_v1beta1.DataCatalogClient.tag_template_path(
             project_id, _CLOUD_PLATFORM_REGION, template_id)
@@ -75,30 +72,28 @@ class TemplateMaker:
 
         if not self.__datacatalog_helper.tag_template_exists(template_name):
             self.__datacatalog_helper.create_tag_template(
-                project_id, template_id, display_name, native_attrs, enums_names)
+                project_id, template_id, display_name, native_fields, enums_names)
 
-    def __process_custom_multivalued_attributes(self, spreadsheet_id, project_id, template_id, display_name,
-                                                master_template_attributes, delete_existing_template):
+    def __process_custom_multivalued_fields(self, spreadsheet_id, project_id, template_id, display_name,
+                                            master_template_fields, delete_existing_template):
 
-        multivalued_attrs = self.__filter_attributes_by_types(
-            master_template_attributes, [_CUSTOM_MULTIVALUED_TYPE])
+        multivalued_fields = self.__filter_fields_by_types(master_template_fields, [_CUSTOM_MULTIVALUED_TYPE])
+        StringFormatter.format_elements_to_snakecase(multivalued_fields, 0)
 
-        StringFormatter.format_elements_to_snakecase(multivalued_attrs, 0)
-
-        for attr in multivalued_attrs:
+        for field in multivalued_fields:
             try:
-                values_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(attr[0]))
-                attributes = [(StringFormatter.format_to_snakecase(value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
-                              for value in values_from_sheet]
+                values_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(field[0]))
+                fields = [(StringFormatter.format_to_snakecase(value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
+                          for value in values_from_sheet]
             except HttpError as err:
                 if err.resp.status in [400]:
                     logging.info('NOT FOUND. Ignoring...')
-                    continue  # Just ignore creating a new template representing the multivalued attribute
+                    continue  # Ignore creating a new template representing the multivalued field
                 else:
                     raise
 
-            custom_template_id = f'{template_id}_{attr[0]}'
-            custom_display_name = f'{display_name} - {attr[1]}'
+            custom_template_id = f'{template_id}_{field[0]}'
+            custom_display_name = f'{display_name} - {field[1]}'
 
             template_name = datacatalog_v1beta1.DataCatalogClient.tag_template_path(
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
@@ -108,11 +103,11 @@ class TemplateMaker:
 
             if not self.__datacatalog_helper.tag_template_exists(template_name):
                 self.__datacatalog_helper.create_tag_template(
-                    project_id, custom_template_id, custom_display_name, attributes)
+                    project_id, custom_template_id, custom_display_name, fields)
 
     @classmethod
-    def __filter_attributes_by_types(cls, attributes, types):
-        return [attribute for attribute in attributes if attribute[2] in types]
+    def __filter_fields_by_types(cls, fields, types):
+        return [field for field in fields if field[2] in types]
 
 
 """
@@ -133,7 +128,7 @@ class GoogleSheetsReader:
         return self.__read(spreadsheet_id, sheet_name, 'helper', values_per_line)
 
     def __read(self, spreadsheet_id, sheet_name, sheet_type, values_per_line):
-        logging.info(_LOOKING_FOR_SHEET_FORMAT.format(sheet_type, spreadsheet_id, sheet_name))
+        logging.info(_LOOKING_FOR_SHEET_LOG_FORMAT.format(sheet_type, spreadsheet_id, sheet_name))
         return self.__load_content(spreadsheet_id, sheet_name, values_per_line)
 
     def __load_content(self, spreadsheet_id, sheet_name, values_per_line):

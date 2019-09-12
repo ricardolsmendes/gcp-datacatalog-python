@@ -12,7 +12,7 @@ _PATCHED_DATACATALOG_CLIENT = 'load_template_google_sheets.datacatalog_v1beta1.D
 class DataCatalogHelperTest(TestCase):
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')
-    def test_create_tag_template_should_handle_provided_fields(self, mock_create_tag_template):
+    def test_create_tag_template_should_handle_described_fields(self, mock_create_tag_template):
         DataCatalogHelper().create_tag_template(
             project_id=None,
             template_id=None,
