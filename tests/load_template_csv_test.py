@@ -1,11 +1,63 @@
+from io import StringIO
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 
 from google.api_core.exceptions import PermissionDenied
 
-from load_template_csv import DataCatalogHelper, StringFormatter
+from load_template_csv import CSVFilesReader, DataCatalogHelper, StringFormatter
 
 _PATCHED_DATACATALOG_CLIENT = 'load_template_csv.datacatalog_v1beta1.DataCatalogClient'
+
+
+class CSVFilesReaderTest(TestCase):
+
+    @patch('builtins.open', new_callable=mock_open())
+    def test_read_master_should_return_content_as_list(self, mock_builtins_open):
+        mock_builtins_open.return_value = StringIO(
+            'col1,col2,col3\n'
+            'val1,val2,val3\n'
+        )
+
+        content = CSVFilesReader.read_master('test-folder', 'test-file-id')
+
+        mock_builtins_open.assert_called_with('test-folder/test-file-id.csv', mode='r')
+        self.assertEqual(1, len(content))  # The first line (header) is ignored.
+        self.assertEqual(3, len(content[0]))
+        self.assertEqual('val2', content[0][1])
+
+    @patch('builtins.open', new_callable=mock_open())
+    def test_read_helper_should_return_content_as_list(self, mock_builtins_open):
+        mock_builtins_open.return_value = StringIO(
+            'col1\n'
+            'val1\n'
+        )
+
+        content = CSVFilesReader.read_helper('test-folder', 'test-file-id')
+
+        mock_builtins_open.assert_called_with('test-folder/test-file-id.csv', mode='r')
+        self.assertEqual(1, len(content))  # The first line (header) is ignored.
+        self.assertEqual(1, len(content[0]))
+        self.assertEqual('val1', content[0][0])
+
+    @patch('builtins.open', new_callable=mock_open())
+    def test_read_should_return_exact_number_values_per_line(self, mock_builtins_open):
+        mock_builtins_open.return_value = StringIO(
+            'col1,col2,col3\n'
+            'val1,val2,val3\n'
+        )
+
+        content = CSVFilesReader.read_master(None, None, values_per_line=2)
+
+        self.assertEqual(2, len(content[0]))
+
+    @patch('builtins.open', new_callable=mock_open())
+    def test_read_should_return_stripped_content(self, mock_builtins_open):
+        mock_builtins_open.return_value = StringIO(
+            'col1,col2,col3\n'
+            'val1, val2  ,val3\n'
+        )
+
+        self.assertEqual('val2', CSVFilesReader.read_master(None, None)[0][1])
 
 
 @patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self, *args: None)
