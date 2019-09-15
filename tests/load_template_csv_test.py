@@ -10,7 +10,7 @@ _PATCHED_DATACATALOG_CLIENT = 'load_template_csv.datacatalog_v1beta1.DataCatalog
 _PATCHED_DATACATALOG_HELPER = 'load_template_csv.DataCatalogHelper'
 
 
-@patch(f'{_PATCHED_DATACATALOG_HELPER}.__init__', lambda self, *args: None)
+@patch(f'{_PATCHED_DATACATALOG_HELPER}.__init__', lambda self: None)
 class TemplateMakerTest(TestCase):
 
     def test_constructor_should_set_instance_attributes(self):
@@ -26,10 +26,7 @@ class TemplateMakerTest(TestCase):
         mock_tag_template_exists.return_value = False
 
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
 
         mock_read_master.assert_called_once()
         mock_tag_template_exists.assert_called_once()
@@ -43,10 +40,7 @@ class TemplateMakerTest(TestCase):
         mock_read_helper.return_value = [['helper_val1']]
 
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
 
         mock_read_helper.assert_called_once()
 
@@ -61,14 +55,11 @@ class TemplateMakerTest(TestCase):
         mock_read_helper.return_value = [['helper_val1']]
 
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template',
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template',
             delete_existing=True)
 
         mock_read_helper.assert_called_once()
-        self.assertEqual(2, mock_create_tag_template.call_count)  # Create the master and helper Templates.
+        self.assertEqual(2, mock_create_tag_template.call_count)  # Both master and helper Templates are created.
 
     @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
     @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
@@ -80,13 +71,10 @@ class TemplateMakerTest(TestCase):
         mock_read_helper.side_effect = FileNotFoundError()
 
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
 
         mock_read_helper.assert_called_once()
-        mock_create_tag_template.assert_called_once()  # Create only the master Template.
+        mock_create_tag_template.assert_called_once()  # Only the master Template is created.
 
     @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
     @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
@@ -94,10 +82,7 @@ class TemplateMakerTest(TestCase):
     @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'BOOL']])
     def test_run_should_not_delete_existing_template_by_default(self, mock_delete_tag_template):
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
 
         mock_delete_tag_template.assert_not_called()
 
@@ -107,10 +92,7 @@ class TemplateMakerTest(TestCase):
     @patch('load_template_csv.CSVFilesReader.read_master', lambda self, *args: [['val1', 'val2', 'BOOL']])
     def test_run_should_delete_existing_template_if_flag_set(self, mock_delete_tag_template):
         TemplateMaker().run(
-            files_folder=None,
-            project_id=None,
-            template_id='test-template-id',
-            display_name='Test Template',
+            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template',
             delete_existing=True)
 
         mock_delete_tag_template.assert_called_once()
@@ -167,7 +149,7 @@ class CSVFilesReaderTest(TestCase):
         self.assertEqual('val2', CSVFilesReader.read_master(None, None)[0][1])
 
 
-@patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self, *args: None)
+@patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self: None)
 class DataCatalogHelperTest(TestCase):
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')

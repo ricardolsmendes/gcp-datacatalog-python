@@ -10,7 +10,7 @@ import unicodedata
 
 from google.api_core.exceptions import PermissionDenied
 from google.cloud import datacatalog_v1beta1
-from googleapiclient.discovery import build
+from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -225,8 +225,9 @@ class GoogleSheetsHelper:
 
     def __init__(self):
         # Initialize the API client.
-        self.__service = build(serviceName='sheets', version='v4',
-                               credentials=ServiceAccountCredentials.get_application_default(), cache_discovery=False)
+        self.__service = discovery.build(
+            serviceName='sheets', version='v4',
+            credentials=ServiceAccountCredentials.get_application_default(), cache_discovery=False)
 
     def read_sheet(self, spreadsheet_id, sheet_name, values_per_line):
         return self.__service.spreadsheets().values().batchGet(

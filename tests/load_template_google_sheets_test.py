@@ -1,14 +1,202 @@
+from httplib2 import Response
 from unittest import TestCase
 from unittest.mock import patch
 
 from google.api_core.exceptions import PermissionDenied
+from googleapiclient.errors import HttpError
 
-from load_template_google_sheets import DataCatalogHelper, StringFormatter
+from load_template_google_sheets import \
+    DataCatalogHelper, GoogleSheetsHelper, GoogleSheetsReader, StringFormatter, TemplateMaker
+
 
 _PATCHED_DATACATALOG_CLIENT = 'load_template_google_sheets.datacatalog_v1beta1.DataCatalogClient'
+_PATCHED_DATACATALOG_HELPER = 'load_template_google_sheets.DataCatalogHelper'
 
 
-@patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self, *args: None)
+@patch(f'{_PATCHED_DATACATALOG_HELPER}.__init__', lambda self: None)
+@patch('load_template_google_sheets.GoogleSheetsReader.__init__', lambda self: None)
+class TemplateMakerTest(TestCase):
+
+    def test_constructor_should_set_instance_attributes(self):
+        self.assertIsNotNone(TemplateMaker().__dict__['_TemplateMaker__sheets_reader'])
+        self.assertIsNotNone(TemplateMaker().__dict__['_TemplateMaker__datacatalog_helper'])
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master')
+    def test_run_should_create_master_template_with_primitive_fields(
+            self, mock_read_master, mock_tag_template_exists, mock_create_tag_template):
+
+        mock_read_master.return_value = [['val1', 'val2', 'BOOL']]
+        mock_tag_template_exists.return_value = False
+
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+
+        mock_read_master.assert_called_once()
+        mock_tag_template_exists.assert_called_once()
+        mock_create_tag_template.assert_called_once()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_helper')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'ENUM']])
+    def test_run_should_create_master_template_with_enum_fields(self, mock_read_helper):
+        mock_read_helper.return_value = [['helper_val1']]
+
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+
+        mock_read_helper.assert_called_once()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template', lambda self, *args: None)
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_helper')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'MULTI']])
+    def test_run_should_create_helper_template_for_multivalued_fields(
+            self, mock_read_helper, mock_create_tag_template):
+
+        mock_read_helper.return_value = [['helper_val1']]
+
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template',
+            delete_existing=True)
+
+        mock_read_helper.assert_called_once()
+        self.assertEqual(2, mock_create_tag_template.call_count)  # Both master and helper Templates are created.
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_helper')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'MULTI']])
+    def test_run_should_ignore_template_for_multivalued_fields_if_sheet_not_found(
+            self, mock_read_helper, mock_create_tag_template):
+
+        error_response = Response({'status': 400, 'reason': 'Not Found'})
+        mock_read_helper.side_effect = HttpError(resp=error_response, content=b'{}')
+
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+
+        mock_read_helper.assert_called_once()
+        mock_create_tag_template.assert_called_once()  # Only the master Template is created.
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template')
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_helper')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'MULTI']])
+    def test_run_should_raise_exception_template_for_multivalued_fields_if_unknown_error(
+            self, mock_read_helper, mock_create_tag_template):
+
+        error_response = Response({'status': 500, 'reason': 'Internal Server Error'})
+        mock_read_helper.side_effect = HttpError(resp=error_response, content=b'{}')
+
+        with self.assertRaises(HttpError):
+            TemplateMaker().run(
+                spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+
+        mock_read_helper.assert_called_once()
+        mock_create_tag_template.assert_called_once()  # Only the master Template is created.
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'BOOL']])
+    def test_run_should_not_delete_existing_template_by_default(self, mock_delete_tag_template):
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+
+        mock_delete_tag_template.assert_not_called()
+
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.create_tag_template', lambda self, *args: None)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.tag_template_exists', lambda self, *args: False)
+    @patch(f'{_PATCHED_DATACATALOG_HELPER}.delete_tag_template')
+    @patch('load_template_google_sheets.GoogleSheetsReader.read_master',
+           lambda self, *args: [['val1', 'val2', 'BOOL']])
+    def test_run_should_delete_existing_template_if_flag_set(self, mock_delete_tag_template):
+        TemplateMaker().run(
+            spreadsheet_id=None, project_id=None, template_id='test-template-id', display_name='Test Template',
+            delete_existing=True)
+
+        mock_delete_tag_template.assert_called_once()
+
+
+@patch('load_template_google_sheets.GoogleSheetsHelper.__init__', lambda self: None)
+class GoogleSheetsReaderTest(TestCase):
+
+    def test_constructor_should_set_instance_attributes(self):
+        self.assertIsNotNone(GoogleSheetsReader().__dict__['_GoogleSheetsReader__sheets_helper'])
+
+    @patch('load_template_google_sheets.GoogleSheetsHelper.read_sheet')
+    def test_read_master_should_return_content_as_list(self, mock_read_sheet):
+        mock_read_sheet.return_value = {
+            'valueRanges': [{
+                'values': [
+                    ['col1', 'col2', 'col3'],
+                    ['val1', 'val2', 'val3']
+                ]
+            }]
+        }
+
+        content = GoogleSheetsReader().read_master('test-id', 'test-name')
+
+        self.assertEqual(1, len(content))  # The first line (header) is ignored.
+        self.assertEqual(3, len(content[0]))
+        self.assertEqual('val2', content[0][1])
+
+    @patch('load_template_google_sheets.GoogleSheetsHelper.read_sheet')
+    def test_read_helper_should_return_content_as_list(self, mock_read_sheet):
+        mock_read_sheet.return_value = {
+            'valueRanges': [{
+                'values': [
+                    ['col1'],
+                    ['val1']
+                ]
+            }]
+        }
+
+        content = GoogleSheetsReader().read_helper('test-id', 'test-name')
+
+        self.assertEqual(1, len(content))  # The first line (header) is ignored.
+        self.assertEqual(1, len(content[0]))
+        self.assertEqual('val1', content[0][0])
+
+    @patch('load_template_google_sheets.GoogleSheetsHelper.read_sheet')
+    def test_read_should_return_exact_number_values_per_line(self, mock_read_sheet):
+        mock_read_sheet.return_value = {
+            'valueRanges': [{
+                'values': [
+                    ['col1', 'col2', 'col3'],
+                    ['val1', 'val2', 'val3']
+                ]
+            }]
+        }
+
+        content = GoogleSheetsReader().read_master(None, None, values_per_line=2)
+
+        self.assertEqual(2, len(content[0]))
+
+    @patch('load_template_google_sheets.GoogleSheetsHelper.read_sheet')
+    def test_read_should_return_stripped_content(self, mock_read_sheet):
+        mock_read_sheet.return_value = {
+            'valueRanges': [{
+                'values': [
+                    ['col1', 'col2', 'col3'],
+                    ['val1', ' val2  ', 'val3']
+                ]
+            }]
+        }
+
+        self.assertEqual('val2', GoogleSheetsReader().read_master(None, None)[0][1])
+
+
+@patch(f'{_PATCHED_DATACATALOG_CLIENT}.__init__', lambda self: None)
 class DataCatalogHelperTest(TestCase):
 
     @patch(f'{_PATCHED_DATACATALOG_CLIENT}.create_tag_template')
@@ -49,6 +237,32 @@ class DataCatalogHelperTest(TestCase):
         tag_template_exists = DataCatalogHelper().tag_template_exists(None)
         self.assertFalse(tag_template_exists)
         mock_get_tag_template.assert_called_once()
+
+
+@patch('load_template_google_sheets.ServiceAccountCredentials.get_application_default', lambda: None)
+@patch('load_template_google_sheets.discovery.build')
+class GoogleSheetsHelperTest(TestCase):
+
+    def test_constructor_should_set_instance_attributes(self, mock_build):
+        self.assertIsNotNone(GoogleSheetsHelper().__dict__['_GoogleSheetsHelper__service'])
+        mock_build.assert_called_once()
+
+    def test_read_sheet_should_get_all_lines_from_requested_columns(self, mock_build):
+        mock_build.return_value\
+            .spreadsheets.return_value\
+            .values.return_value\
+            .batchGet.return_value\
+            .execute.return_value = {}
+
+        sheet_data = GoogleSheetsHelper().read_sheet(
+            spreadsheet_id='test-id', sheet_name='test-name', values_per_line=2)
+
+        self.assertEqual({}, sheet_data)
+
+        mock_build.return_value\
+            .spreadsheets.return_value\
+            .values.return_value\
+            .batchGet.assert_called_with(spreadsheetId='test-id', ranges='test-name!A:B')
 
 
 class StringFormatterTest(TestCase):
