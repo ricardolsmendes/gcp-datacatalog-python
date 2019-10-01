@@ -128,18 +128,15 @@ class GoogleSheetsReader:
         return self.__read(spreadsheet_id, sheet_name, 'helper', values_per_line)
 
     def __read(self, spreadsheet_id, sheet_name, sheet_type, values_per_line):
+        """
+        Read the requested values from each line and store them into a list.
+
+        :param spreadsheet_id: Spreadsheet ID.
+        :param sheet_name: Sheet name.
+        :param sheet_type: Sheet type (master | helper).
+        :param values_per_line: Number of consecutive values to be read from each line.
+        """
         logging.info(_LOOKING_FOR_SHEET_LOG_FORMAT.format(sheet_type, spreadsheet_id, sheet_name))
-        return self.__load_content(spreadsheet_id, sheet_name, values_per_line)
-
-    def __load_content(self, spreadsheet_id, sheet_name, values_per_line):
-        """
-        Load the initial values from each line and store them into a list.
-
-        Args:
-            spreadsheet_id: The spreadsheet ID.
-            sheet_name : Sheet's name
-            values_per_line: The number of sequential values to read from each line.
-        """
         sheet_data = self.__sheets_helper.read_sheet(spreadsheet_id, sheet_name, values_per_line)
 
         data = []
@@ -243,17 +240,17 @@ Tools & utilities
 
 class StringFormatter:
 
-    @staticmethod
-    def format_elements_to_snakecase(a_list, internal_index=None):
+    @classmethod
+    def format_elements_to_snakecase(cls, a_list, internal_index=None):
         if internal_index is None:
             for counter in range(len(a_list)):
-                a_list[counter] = StringFormatter.format_to_snakecase(a_list[counter])
+                a_list[counter] = cls.format_to_snakecase(a_list[counter])
         else:
             for element in a_list:
-                element[internal_index] = StringFormatter.format_to_snakecase(element[internal_index])
+                element[internal_index] = cls.format_to_snakecase(element[internal_index])
 
-    @staticmethod
-    def format_to_snakecase(string):
+    @classmethod
+    def format_to_snakecase(cls, string):
         normalized_str = unicodedata.normalize('NFKD', string).encode('ASCII', 'ignore').decode()
         normalized_str = re.sub(r'[^a-zA-Z0-9]+', ' ', normalized_str)
         normalized_str = normalized_str.strip()

@@ -113,42 +113,35 @@ Input reader
 
 class CSVFilesReader:
 
-    @staticmethod
-    def read_master(folder, file_id, values_per_line=3):
-        return CSVFilesReader.__read(folder, file_id, 'master', values_per_line)
+    @classmethod
+    def read_master(cls, folder, file_id, values_per_line=3):
+        return cls.__read(folder, file_id, 'master', values_per_line)
 
-    @staticmethod
-    def read_helper(folder, file_id, values_per_line=1):
-        return CSVFilesReader.__read(folder, file_id, 'helper', values_per_line)
+    @classmethod
+    def read_helper(cls, folder, file_id, values_per_line=1):
+        return cls.__read(folder, file_id, 'helper', values_per_line)
 
-    @staticmethod
-    def __read(folder, file_id, file_type, values_per_line):
-        file_path = CSVFilesReader.__normalize_path(
+    @classmethod
+    def __read(cls, folder, file_id, file_type, values_per_line):
+        """
+        Read the requested values from each line and store them into a list.
+        Example: CSV name,display name,type => Python list ['name','display name','type'].
+
+        :param folder: CSV file container folder.
+        :param file_id: File name with no .csv suffix.
+        :param file_type: File type (master | helper).
+        :param values_per_line: The number of consecutive values to be read from each line.
+        """
+        file_path = cls.__normalize_path(
             _FOLDER_PLUS_CSV_FILENAME_FORMAT.format(folder, file_id))
 
         logging.info(_LOOKING_FOR_FILE_LOG_FORMAT.format(file_type, file_path))
-        return CSVFilesReader.__load_content(file_path, values_per_line)
 
-    @staticmethod
-    def __normalize_path(file_path):
-        return re.sub(r'/+', '/', file_path)
-
-    @staticmethod
-    def __load_content(file_path, values_per_line, delimiter=','):
-        """
-        Load the initial values from each line and store them into a list.
-        Example: CSV name,display name,type => Python list ['name','display name','type']
-
-        Args:
-            file_path: CSV file path.
-            values_per_line: The number of sequential values to read from each line.
-            delimiter: Values delimiter.
-        """
         data = []
 
         with open(file_path, mode='r') as csv_file:
             logging.info(f'Reading file {file_path}...')
-            for row in csv.reader(csv_file, delimiter=delimiter):
+            for row in csv.reader(csv_file):
                 row_data = []
                 for counter in range(values_per_line):
                     row_data.append(row[counter].strip())
@@ -159,6 +152,10 @@ class CSVFilesReader:
 
         logging.info('DONE')
         return data
+
+    @classmethod
+    def __normalize_path(cls, path):
+        return re.sub(r'/+', '/', path)
 
 
 """
@@ -229,17 +226,17 @@ Tools & utilities
 
 class StringFormatter:
 
-    @staticmethod
-    def format_elements_to_snakecase(a_list, internal_index=None):
+    @classmethod
+    def format_elements_to_snakecase(cls, a_list, internal_index=None):
         if internal_index is None:
             for counter in range(len(a_list)):
-                a_list[counter] = StringFormatter.format_to_snakecase(a_list[counter])
+                a_list[counter] = cls.format_to_snakecase(a_list[counter])
         else:
             for element in a_list:
-                element[internal_index] = StringFormatter.format_to_snakecase(element[internal_index])
+                element[internal_index] = cls.format_to_snakecase(element[internal_index])
 
-    @staticmethod
-    def format_to_snakecase(string):
+    @classmethod
+    def format_to_snakecase(cls, string):
         normalized_str = unicodedata.normalize('NFKD', string).encode('ASCII', 'ignore').decode()
         normalized_str = re.sub(r'[^a-zA-Z0-9]+', ' ', normalized_str)
         normalized_str = normalized_str.strip()
