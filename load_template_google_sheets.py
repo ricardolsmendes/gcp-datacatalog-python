@@ -133,7 +133,7 @@ class GoogleSheetsReader:
 
         :param spreadsheet_id: Spreadsheet ID.
         :param sheet_name: Sheet name.
-        :param sheet_type: Sheet type (master | helper).
+        :param sheet_type: Sheet type {'master', 'helper'}.
         :param values_per_line: Number of consecutive values to be read from each line.
         """
         logging.info(_LOOKING_FOR_SHEET_LOG_FORMAT.format(sheet_type, spreadsheet_id, sheet_name))

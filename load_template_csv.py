@@ -129,7 +129,7 @@ class CSVFilesReader:
 
         :param folder: CSV file container folder.
         :param file_id: File name with no .csv suffix.
-        :param file_type: File type (master | helper).
+        :param file_type: File type {'master', 'helper'}.
         :param values_per_line: The number of consecutive values to be read from each line.
         """
         file_path = cls.__normalize_path(
