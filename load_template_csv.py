@@ -39,7 +39,7 @@ Template maker
 class TemplateMaker:
 
     def __init__(self):
-        self.__datacatalog_helper = DataCatalogHelper()
+        self.__datacatalog_facade = DataCatalogFacade()
 
     def run(self, files_folder, project_id, template_id, display_name, delete_existing=False):
         master_template_fields = CSVFilesReader.read_master(files_folder, stringcase.spinalcase(template_id))
@@ -66,10 +66,10 @@ class TemplateMaker:
             project_id, _CLOUD_PLATFORM_REGION, template_id)
 
         if delete_existing_template:
-            self.__datacatalog_helper.delete_tag_template(template_name)
+            self.__datacatalog_facade.delete_tag_template(template_name)
 
-        if not self.__datacatalog_helper.tag_template_exists(template_name):
-            self.__datacatalog_helper.create_tag_template(
+        if not self.__datacatalog_facade.tag_template_exists(template_name):
+            self.__datacatalog_facade.create_tag_template(
                 project_id, template_id, display_name, native_fields, enums_names)
 
     def __process_custom_multivalued_fields(self, files_folder, project_id, template_id, display_name,
@@ -94,10 +94,10 @@ class TemplateMaker:
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
 
             if delete_existing_template:
-                self.__datacatalog_helper.delete_tag_template(template_name)
+                self.__datacatalog_facade.delete_tag_template(template_name)
 
-            if not self.__datacatalog_helper.tag_template_exists(template_name):
-                self.__datacatalog_helper.create_tag_template(
+            if not self.__datacatalog_facade.tag_template_exists(template_name):
+                self.__datacatalog_facade.create_tag_template(
                     project_id, custom_template_id, custom_display_name, fields)
 
     @classmethod
@@ -164,7 +164,7 @@ API communication classes
 """
 
 
-class DataCatalogHelper:
+class DataCatalogFacade:
     """
     Manage Templates by communicating to Data Catalog's API.
     """

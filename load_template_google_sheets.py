@@ -41,7 +41,7 @@ class TemplateMaker:
 
     def __init__(self):
         self.__sheets_reader = GoogleSheetsReader()
-        self.__datacatalog_helper = DataCatalogHelper()
+        self.__datacatalog_facade = DataCatalogFacade()
 
     def run(self, spreadsheet_id, project_id, template_id, display_name, delete_existing=False):
         master_template_fields = self.__sheets_reader.read_master(spreadsheet_id, stringcase.spinalcase(template_id))
@@ -68,10 +68,10 @@ class TemplateMaker:
             project_id, _CLOUD_PLATFORM_REGION, template_id)
 
         if delete_existing_template:
-            self.__datacatalog_helper.delete_tag_template(template_name)
+            self.__datacatalog_facade.delete_tag_template(template_name)
 
-        if not self.__datacatalog_helper.tag_template_exists(template_name):
-            self.__datacatalog_helper.create_tag_template(
+        if not self.__datacatalog_facade.tag_template_exists(template_name):
+            self.__datacatalog_facade.create_tag_template(
                 project_id, template_id, display_name, native_fields, enums_names)
 
     def __process_custom_multivalued_fields(self, spreadsheet_id, project_id, template_id, display_name,
@@ -99,10 +99,10 @@ class TemplateMaker:
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
 
             if delete_existing_template:
-                self.__datacatalog_helper.delete_tag_template(template_name)
+                self.__datacatalog_facade.delete_tag_template(template_name)
 
-            if not self.__datacatalog_helper.tag_template_exists(template_name):
-                self.__datacatalog_helper.create_tag_template(
+            if not self.__datacatalog_facade.tag_template_exists(template_name):
+                self.__datacatalog_facade.create_tag_template(
                     project_id, custom_template_id, custom_display_name, fields)
 
     @classmethod
@@ -119,7 +119,7 @@ Input reader
 class GoogleSheetsReader:
 
     def __init__(self):
-        self.__sheets_helper = GoogleSheetsHelper()
+        self.__sheets_facade = GoogleSheetsFacade()
 
     def read_master(self, spreadsheet_id, sheet_name, values_per_line=3):
         return self.__read(spreadsheet_id, sheet_name, 'master', values_per_line)
@@ -137,7 +137,7 @@ class GoogleSheetsReader:
         :param values_per_line: Number of consecutive values to be read from each line.
         """
         logging.info(_LOOKING_FOR_SHEET_LOG_FORMAT.format(sheet_type, spreadsheet_id, sheet_name))
-        sheet_data = self.__sheets_helper.read_sheet(spreadsheet_id, sheet_name, values_per_line)
+        sheet_data = self.__sheets_facade.read_sheet(spreadsheet_id, sheet_name, values_per_line)
 
         data = []
 
@@ -161,7 +161,7 @@ API communication classes
 """
 
 
-class DataCatalogHelper:
+class DataCatalogFacade:
     """
     Manage Templates by communicating to Data Catalog's API.
     """
@@ -215,7 +215,7 @@ class DataCatalogHelper:
             return False
 
 
-class GoogleSheetsHelper:
+class GoogleSheetsFacade:
     """
     Access spreadsheets data by communicating to the Google Sheets API.
     """

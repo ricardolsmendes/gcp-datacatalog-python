@@ -18,7 +18,7 @@ from google.api_core.exceptions import PermissionDenied
 from google.cloud import datacatalog_v1beta1
 
 
-class DataCatalogHelper:
+class DataCatalogFacade:
 
     @classmethod
     def __fetch_search_results(cls, results_pages_iterator):
@@ -142,12 +142,12 @@ class DataCatalogHelper:
 
 
 def __show_datacatalog_api_core_features(organization_id, project_id):
-    datacatalog_helper = DataCatalogHelper()
+    datacatalog_facade = DataCatalogFacade()
 
     # ================================================================================
     # 1. Search for BigQuery Datasets.
     # ================================================================================
-    bq_datasets_search_results = datacatalog_helper.search_catalog(
+    bq_datasets_search_results = datacatalog_facade.search_catalog(
         organization_id, 'system=bigquery type=dataset quickstart')
 
     print(bq_datasets_search_results)
@@ -155,7 +155,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 2. Search for assets having the 'email' word in their columns metadata.
     # ================================================================================
-    bq_tables_column_search_results = datacatalog_helper.search_catalog(
+    bq_tables_column_search_results = datacatalog_facade.search_catalog(
         organization_id, 'column:email')
 
     print(bq_tables_column_search_results)
@@ -168,7 +168,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     table_2_search_result = next(result for result in bq_tables_column_search_results
                                  if result.linked_resource == table_2_resource_name)
 
-    table_2_entry = datacatalog_helper.get_entry(table_2_search_result.relative_resource_name)
+    table_2_entry = datacatalog_facade.get_entry(table_2_search_result.relative_resource_name)
 
     print(table_2_entry)
 
@@ -177,7 +177,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     table_1_resource_name = f'//bigquery.googleapis.com/projects/{project_id}' \
                             f'/datasets/datacatalog_quickstart/tables/table_1'
-    table_1_entry = datacatalog_helper.lookup_entry(table_1_resource_name)
+    table_1_entry = datacatalog_facade.lookup_entry(table_1_resource_name)
 
     print(table_1_entry)
 
@@ -186,13 +186,13 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # Delete a Tag Template with the same name if it already exists.
     try:
-        datacatalog_helper.delete_tag_template(
+        datacatalog_facade.delete_tag_template(
             datacatalog_v1beta1.DataCatalogClient.tag_template_path(
                 project=project_id, location='us-central1', tag_template='quickstart_classification_template'))
     except PermissionDenied:
         pass
 
-    template = datacatalog_helper.create_tag_template(
+    template = datacatalog_facade.create_tag_template(
         project_id=project_id,
         template_id='quickstart_classification_template',
         display_name='A Tag Template to be used in the hands-on guide',
@@ -210,7 +210,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 6. Add a field to the tag template.
     # ================================================================================
-    datacatalog_helper.create_tag_template_field(
+    datacatalog_facade.create_tag_template_field(
         template_name=template.name,
         field_id='pii_type',
         display_name='PII Type',
@@ -220,13 +220,13 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
         ]
     )
 
-    template = datacatalog_helper.get_tag_template(template.name)
+    template = datacatalog_facade.get_tag_template(template.name)
     print(template)
 
     # ================================================================================
     # 7. Create a tag to table_1 catalog entry.
     # ================================================================================
-    tag_entry_table_1 = datacatalog_helper.create_tag(
+    tag_entry_table_1 = datacatalog_facade.create_tag(
         entry=table_1_entry,
         tag_template=template,
         fields_descriptors=[
@@ -243,7 +243,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 8. Create a tag to table_2 catalog entry.
     # ================================================================================
-    tag_entry_table_2 = datacatalog_helper.create_tag(
+    tag_entry_table_2 = datacatalog_facade.create_tag(
         entry=table_2_entry,
         tag_template=template,
         fields_descriptors=[
@@ -265,7 +265,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 9. Search for assets tagged with the tag template.
     # ================================================================================
-    tag_template_search_results = datacatalog_helper.search_catalog(
+    tag_template_search_results = datacatalog_facade.search_catalog(
         organization_id, 'tag:quickstart_classification_template')
 
     print(tag_template_search_results)
@@ -273,7 +273,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 10. Search for assets tagged with a given value.
     # ================================================================================
-    tag_value_search_results = datacatalog_helper.search_catalog(
+    tag_value_search_results = datacatalog_facade.search_catalog(
         organization_id, 'tag:quickstart_classification_template.has_pii=True')
 
     print(tag_value_search_results)
