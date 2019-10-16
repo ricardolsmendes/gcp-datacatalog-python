@@ -15,50 +15,10 @@ for further details.
 import argparse
 
 from google.api_core.exceptions import PermissionDenied
-from google.cloud.datacatalog import enums, types
-from google.cloud.datacatalog_v1beta1 import DataCatalogClient
+from google.cloud.datacatalog import DataCatalogClient, enums, types
 
 
 class DataCatalogFacade:
-
-    @classmethod
-    def __fetch_search_results(cls, results_pages_iterator):
-        return [result for result in results_pages_iterator]
-
-    @classmethod
-    def __set_tag_field_value(cls, field, value, primitive_type=None):
-        set_primitive_field_value_functions = {
-            enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
-            enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
-            enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
-            enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
-        }
-
-        if primitive_type:
-            set_primitive_field_value = set_primitive_field_value_functions[primitive_type]
-            set_primitive_field_value(field, value)
-        else:
-            cls.__set_enum_field_value(field, value)
-
-    @classmethod
-    def __set_bool_field_value(cls, field, value):
-        field.bool_value = value
-
-    @classmethod
-    def __set_double_field_value(cls, field, value):
-        field.double_value = value
-
-    @classmethod
-    def __set_enum_field_value(cls, field, value):
-        field.enum_value.display_name = value
-
-    @classmethod
-    def __set_string_field_value(cls, field, value):
-        field.string_value = value
-
-    @classmethod
-    def __set_timestamp_field_value(cls, field, value_as_string):
-        field.timestamp_value.FromJsonString(value_as_string)
 
     def __init__(self):
         # Initialize the API client.
@@ -118,6 +78,41 @@ class DataCatalogFacade:
 
         return self.__datacatalog.create_tag(parent=entry.name, tag=tag)
 
+    @classmethod
+    def __set_tag_field_value(cls, field, value, primitive_type=None):
+        set_primitive_field_value_functions = {
+            enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
+            enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
+            enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
+            enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
+        }
+
+        if primitive_type:
+            set_primitive_field_value = set_primitive_field_value_functions[primitive_type]
+            set_primitive_field_value(field, value)
+        else:
+            cls.__set_enum_field_value(field, value)
+
+    @classmethod
+    def __set_bool_field_value(cls, field, value):
+        field.bool_value = value
+
+    @classmethod
+    def __set_double_field_value(cls, field, value):
+        field.double_value = value
+
+    @classmethod
+    def __set_enum_field_value(cls, field, value):
+        field.enum_value.display_name = value
+
+    @classmethod
+    def __set_string_field_value(cls, field, value):
+        field.string_value = value
+
+    @classmethod
+    def __set_timestamp_field_value(cls, field, value_as_string):
+        field.timestamp_value.FromJsonString(value_as_string)
+
     def delete_tag(self, name):
         """Delete a Tag."""
 
@@ -140,6 +135,10 @@ class DataCatalogFacade:
         scope.include_org_ids.append(organization_id)
 
         return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
+
+    @classmethod
+    def __fetch_search_results(cls, results_pages_iterator):
+        return [result for result in results_pages_iterator]
 
 
 def __show_datacatalog_api_core_features(organization_id, project_id):

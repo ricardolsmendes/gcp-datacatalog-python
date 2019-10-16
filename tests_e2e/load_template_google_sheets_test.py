@@ -1,7 +1,7 @@
 import json
 import os
 
-from google.cloud.datacatalog_v1beta1 import DataCatalogClient
+from google.cloud.datacatalog import DataCatalogClient
 
 from load_template_google_sheets import TemplateMaker
 

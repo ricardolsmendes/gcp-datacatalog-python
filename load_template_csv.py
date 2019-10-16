@@ -10,8 +10,7 @@ import stringcase
 import unicodedata
 
 from google.api_core.exceptions import PermissionDenied
-from google.cloud.datacatalog import enums, types
-from google.cloud.datacatalog_v1beta1 import DataCatalogClient
+from google.cloud.datacatalog import DataCatalogClient, enums, types
 
 
 """
