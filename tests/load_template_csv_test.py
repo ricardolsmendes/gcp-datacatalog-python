@@ -6,7 +6,7 @@ from google.api_core.exceptions import PermissionDenied
 
 from load_template_csv import CSVFilesReader, DataCatalogFacade, StringFormatter, TemplateMaker
 
-_PATCHED_DATACATALOG_CLIENT = 'load_template_csv.datacatalog_v1beta1.DataCatalogClient'
+_PATCHED_DATACATALOG_CLIENT = 'load_template_csv.DataCatalogClient'
 _PATCHED_DATACATALOG_FACADE = 'load_template_csv.DataCatalogFacade'
 
 

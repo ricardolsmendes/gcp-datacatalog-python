@@ -15,7 +15,8 @@ for further details.
 import argparse
 
 from google.api_core.exceptions import PermissionDenied
-from google.cloud import datacatalog_v1beta1
+from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog_v1beta1 import DataCatalogClient
 
 
 class DataCatalogFacade:
@@ -27,10 +28,10 @@ class DataCatalogFacade:
     @classmethod
     def __set_tag_field_value(cls, field, value, primitive_type=None):
         set_primitive_field_value_functions = {
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
-            datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
+            enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
+            enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
+            enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
+            enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
         }
 
         if primitive_type:
@@ -61,14 +62,14 @@ class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = datacatalog_v1beta1.DataCatalogClient()
+        self.__datacatalog = DataCatalogClient()
 
     def create_tag_template(self, project_id, template_id, display_name, primitive_fields_descriptors):
         """Create a Tag Template."""
 
         location = self.__datacatalog.location_path(project_id, 'us-central1')
 
-        tag_template = datacatalog_v1beta1.types.TagTemplate()
+        tag_template = types.TagTemplate()
         tag_template.display_name = display_name
 
         for descriptor in primitive_fields_descriptors:
@@ -91,7 +92,7 @@ class DataCatalogFacade:
     def create_tag_template_field(self, template_name, field_id, display_name, enum_values):
         """Add field to a Tag Template."""
 
-        field = datacatalog_v1beta1.types.TagTemplateField()
+        field = types.TagTemplateField()
         field.display_name = display_name
 
         for enum_value in enum_values:
@@ -108,7 +109,7 @@ class DataCatalogFacade:
     def create_tag(self, entry, tag_template, fields_descriptors):
         """Create a Tag."""
 
-        tag = datacatalog_v1beta1.types.Tag()
+        tag = types.Tag()
         tag.template = tag_template.name
 
         for descriptor in fields_descriptors:
@@ -135,7 +136,7 @@ class DataCatalogFacade:
     def search_catalog(self, organization_id, query):
         """Search Data Catalog for a given organization."""
 
-        scope = datacatalog_v1beta1.types.SearchCatalogRequest.Scope()
+        scope = types.SearchCatalogRequest.Scope()
         scope.include_org_ids.append(organization_id)
 
         return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
@@ -187,7 +188,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # Delete a Tag Template with the same name if it already exists.
     try:
         datacatalog_facade.delete_tag_template(
-            datacatalog_v1beta1.DataCatalogClient.tag_template_path(
+            DataCatalogClient.tag_template_path(
                 project=project_id, location='us-central1', tag_template='quickstart_classification_template'))
     except PermissionDenied:
         pass
@@ -199,7 +200,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
         primitive_fields_descriptors=[
             {
                 'id': 'has_pii',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL,
+                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
                 'display_name': 'Has PII'
             }
         ]
@@ -232,7 +233,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
         fields_descriptors=[
             {
                 'id': 'has_pii',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL,
+                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
                 'value': False
             }
         ]
@@ -249,7 +250,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
         fields_descriptors=[
             {
                 'id': 'has_pii',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL,
+                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
                 'value': True
             },
             {

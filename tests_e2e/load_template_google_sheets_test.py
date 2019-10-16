@@ -1,7 +1,7 @@
 import json
 import os
 
-from google.cloud import datacatalog_v1beta1
+from google.cloud.datacatalog_v1beta1 import DataCatalogClient
 
 from load_template_google_sheets import TemplateMaker
 
@@ -23,7 +23,7 @@ def test_tempate_maker_run():
     main_template_name = f'{location_name}/tagTemplates/template_abc'
     multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
-    datacatalog = datacatalog_v1beta1.DataCatalogClient()
+    datacatalog = DataCatalogClient()
 
     assert datacatalog.get_tag_template(name=main_template_name)
     assert datacatalog.get_tag_template(name=multivalued_field_template_name)

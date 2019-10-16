@@ -4,13 +4,14 @@ import time
 import uuid
 
 from google.api_core.exceptions import PermissionDenied
-from google.cloud import datacatalog_v1beta1
+from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog_v1beta1 import DataCatalogClient
 
 from .bigquery import table
 
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
-datacatalog_client = datacatalog_v1beta1.DataCatalogClient()
+datacatalog_client = DataCatalogClient()
 
 
 def __generate_uuid(length=5):
@@ -30,15 +31,11 @@ def tag_template(scope='function'):
     except PermissionDenied:
         pass
 
-    template = datacatalog_v1beta1.types.TagTemplate()
-    template.fields['boolean_field'].type.primitive_type = \
-        datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL
-    template.fields['double_field'].type.primitive_type = \
-        datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE
-    template.fields['string_field'].type.primitive_type = \
-        datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING
-    template.fields['timestamp_field'].type.primitive_type = \
-        datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP
+    template = types.TagTemplate()
+    template.fields['boolean_field'].type.primitive_type = enums.FieldType.PrimitiveType.BOOL
+    template.fields['double_field'].type.primitive_type = enums.FieldType.PrimitiveType.DOUBLE
+    template.fields['string_field'].type.primitive_type = enums.FieldType.PrimitiveType.STRING
+    template.fields['timestamp_field'].type.primitive_type = enums.FieldType.PrimitiveType.TIMESTAMP
 
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 1'
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 2'
@@ -64,7 +61,7 @@ def table_entry(table, scope='function'):
 
 @pytest.fixture
 def tag(table_entry, tag_template, scope='function'):
-    tag = datacatalog_v1beta1.types.Tag()
+    tag = types.Tag()
     tag.template = tag_template.name
 
     tag.fields['boolean_field'].bool_value = True

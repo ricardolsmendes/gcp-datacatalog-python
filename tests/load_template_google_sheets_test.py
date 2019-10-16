@@ -9,7 +9,7 @@ from load_template_google_sheets import \
     DataCatalogFacade, GoogleSheetsFacade, GoogleSheetsReader, StringFormatter, TemplateMaker
 
 
-_PATCHED_DATACATALOG_CLIENT = 'load_template_google_sheets.datacatalog_v1beta1.DataCatalogClient'
+_PATCHED_DATACATALOG_CLIENT = 'load_template_google_sheets.DataCatalogClient'
 _PATCHED_DATACATALOG_FACADE = 'load_template_google_sheets.DataCatalogFacade'
 
 

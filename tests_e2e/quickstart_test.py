@@ -2,7 +2,8 @@ import os
 import re
 
 from google.api_core.exceptions import InvalidArgument, PermissionDenied
-from google.cloud import datacatalog_v1beta1
+from google.cloud.datacatalog_v1beta1 import DataCatalogClient
+from google.cloud.datacatalog import enums
 
 from quickstart import DataCatalogFacade
 
@@ -12,7 +13,7 @@ from .datacatalog import table_entry, tag, tag_template
 TEST_ORGANIZATION_ID = os.environ['GOOGLE_CLOUD_TEST_ORGANIZATION_ID']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
-datacatalog = datacatalog_v1beta1.DataCatalogClient()
+datacatalog = DataCatalogClient()
 datacatalog_facade = DataCatalogFacade()
 
 
@@ -24,22 +25,22 @@ def test_datacatalog_facade_create_tag_template():
         primitive_fields_descriptors=[
             {
                 'id': 'boolean_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL,
+                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
                 'display_name': 'Testing boolean fields'
             },
             {
                 'id': 'double_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE,
+                'primitive_type': enums.FieldType.PrimitiveType.DOUBLE,
                 'display_name': 'Testing double fields'
             },
             {
                 'id': 'string_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING,
+                'primitive_type': enums.FieldType.PrimitiveType.STRING,
                 'display_name': 'Testing string fields'
             },
             {
                 'id': 'datetime_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP,
+                'primitive_type': enums.FieldType.PrimitiveType.TIMESTAMP,
                 'display_name': 'Testing timestamp fields'
             }
         ]
@@ -79,22 +80,22 @@ def test_datacatalog_facade_create_tag(table, tag_template):
         fields_descriptors=[
             {
                 'id': 'boolean_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.BOOL,
+                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
                 'value': True
             },
             {
                 'id': 'double_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.DOUBLE,
+                'primitive_type': enums.FieldType.PrimitiveType.DOUBLE,
                 'value': 10.5
             },
             {
                 'id': 'string_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.STRING,
+                'primitive_type': enums.FieldType.PrimitiveType.STRING,
                 'value': 'test'
             },
             {
                 'id': 'timestamp_field',
-                'primitive_type': datacatalog_v1beta1.enums.FieldType.PrimitiveType.TIMESTAMP,
+                'primitive_type': enums.FieldType.PrimitiveType.TIMESTAMP,
                 'value': '2019-07-04T01:00:30Z'
             },
             {

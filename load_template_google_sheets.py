@@ -9,7 +9,8 @@ import stringcase
 import unicodedata
 
 from google.api_core.exceptions import PermissionDenied
-from google.cloud import datacatalog_v1beta1
+from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog_v1beta1 import DataCatalogClient
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from oauth2client.service_account import ServiceAccountCredentials
@@ -64,8 +65,7 @@ class TemplateMaker:
             names_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(field[0]))
             enums_names[field[0]] = [name[0] for name in names_from_sheet]
 
-        template_name = datacatalog_v1beta1.DataCatalogClient.tag_template_path(
-            project_id, _CLOUD_PLATFORM_REGION, template_id)
+        template_name = DataCatalogClient.tag_template_path(project_id, _CLOUD_PLATFORM_REGION, template_id)
 
         if delete_existing_template:
             self.__datacatalog_facade.delete_tag_template(template_name)
@@ -95,7 +95,7 @@ class TemplateMaker:
             custom_template_id = f'{template_id}_{field[0]}'
             custom_display_name = f'{display_name} - {field[1]}'
 
-            template_name = datacatalog_v1beta1.DataCatalogClient.tag_template_path(
+            template_name = DataCatalogClient.tag_template_path(
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
 
             if delete_existing_template:
@@ -106,8 +106,8 @@ class TemplateMaker:
                     project_id, custom_template_id, custom_display_name, fields)
 
     @classmethod
-    def __filter_fields_by_types(cls, fields, types):
-        return [field for field in fields if field[2] in types]
+    def __filter_fields_by_types(cls, fields, valid_types):
+        return [field for field in fields if field[2] in valid_types]
 
 
 """
@@ -168,14 +168,14 @@ class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = datacatalog_v1beta1.DataCatalogClient()
+        self.__datacatalog = DataCatalogClient()
 
     def create_tag_template(self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
         """Create a Tag Template."""
 
-        location = datacatalog_v1beta1.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
+        location = DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
 
-        tag_template = datacatalog_v1beta1.types.TagTemplate()
+        tag_template = types.TagTemplate()
         tag_template.display_name = display_name
 
         for descriptor in fields_descriptors:
@@ -185,8 +185,7 @@ class DataCatalogFacade:
             tag_template.fields[field_id].display_name = descriptor[1]
 
             if not field_type == _DATA_CATALOG_ENUM_TYPE:
-                tag_template.fields[field_id].type.primitive_type = \
-                    datacatalog_v1beta1.enums.FieldType.PrimitiveType[field_type]
+                tag_template.fields[field_id].type.primitive_type = enums.FieldType.PrimitiveType[field_type]
             else:
                 for enum_name in enums_names[field_id]:
                     tag_template.fields[field_id].type.enum_type.allowed_values.add().display_name = enum_name
