@@ -37,7 +37,7 @@ jobs:
           name: run unit tests
           command: |
             . venv/bin/activate
-            pytest
+            pytest tests
 
       - store_artifacts:
           path: htmlcov
