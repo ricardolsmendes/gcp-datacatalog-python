@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Run the unit tests.
-RUN pytest tests --cov --cov-report term-missing
+RUN pytest tests
