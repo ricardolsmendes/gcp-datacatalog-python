@@ -40,7 +40,7 @@ cd gcp-datacatalog-python
 
 Using *virtualenv* is optional, but strongly recommended unless you use [Docker](#24-docker).
 
-##### 2.3.1. Install Python 3.7
+##### 2.3.1. Install Python 3.6+
 
 ##### 2.3.2. Create and activate an isolated Python environment
 
