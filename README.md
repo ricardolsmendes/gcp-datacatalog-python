@@ -1,6 +1,8 @@
 # gcp-datacatalog-python
 
-Self-contained ready-to-use Python scripts to help Data Citizens who work with [Google Cloud Data Catalog](https://cloud.google.com/data-catalog).
+Self-contained ready-to-use Python scripts to help Data Citizens who work with [Google Cloud Data Catalog][1].
+
+[![CircleCI][2]][3]
 
 - [Quickstart](#3-quickstart): sample code for Data Catalog's API core features.
 
@@ -220,3 +222,7 @@ docker run --rm --tty gcp-datacatalog-python \
   --project-id PROJECT_ID --spreadsheet-id SPREADSHEET_ID \
   [--delete-existing]
 ```
+
+[1]: https://cloud.google.com/data-catalog
+[2]: https://circleci.com/gh/ricardolsmendes/gcp-datacatalog-python.svg?style=svg
+[3]: https://circleci.com/gh/ricardolsmendes/gcp-datacatalog-python
