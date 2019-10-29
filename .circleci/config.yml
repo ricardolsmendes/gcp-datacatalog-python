@@ -21,7 +21,7 @@ jobs:
             - v1-dependencies-
 
       - run:
-          name: install dependencies
+          name: Set up a virtual environment
           command: |
             python3 -m venv venv
             . venv/bin/activate
@@ -34,7 +34,7 @@ jobs:
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
-          name: run unit tests
+          name: Run the unit tests
           command: |
             . venv/bin/activate
             pytest tests
