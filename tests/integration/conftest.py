@@ -21,7 +21,7 @@ def __generate_uuid(length=5):
 
 
 @pytest.fixture
-def bigquery_dataset(scope='function'):
+def bigquery_dataset():
     name = f'{TEST_PROJECT_ID}.{__generate_uuid()}_quickstart_test_dataset'
     dataset = bigquery_client.create_dataset(name)
 
@@ -33,7 +33,7 @@ def bigquery_dataset(scope='function'):
 
 
 @pytest.fixture
-def bigquery_table(bigquery_dataset, scope='function'):
+def bigquery_table(bigquery_dataset):
     name = f'{TEST_PROJECT_ID}.{bigquery_dataset.dataset_id}.{__generate_uuid()}_quickstart_test_table'
     schema = [
         bigquery.SchemaField('name', 'STRING', 'REQUIRED'),
@@ -49,7 +49,7 @@ def bigquery_table(bigquery_dataset, scope='function'):
 
 
 @pytest.fixture
-def datacatalog_table_entry(bigquery_table, scope='function'):
+def datacatalog_table_entry(bigquery_table):
     entry = datacatalog_client.lookup_entry(
         linked_resource=f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
                         f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
@@ -58,7 +58,7 @@ def datacatalog_table_entry(bigquery_table, scope='function'):
 
 
 @pytest.fixture
-def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template, scope='function'):
+def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
     tag = types.Tag()
     tag.template = datacatalog_tag_template.name
 
@@ -78,7 +78,7 @@ def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template, scope='fu
 
 
 @pytest.fixture
-def datacatalog_tag_template(scope='function'):
+def datacatalog_tag_template():
     location = datacatalog.DataCatalogClient.location_path(TEST_PROJECT_ID, 'us-central1')
 
     # Delete a Tag Template with the same name if it already exists.
