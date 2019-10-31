@@ -2,18 +2,106 @@ import os
 import re
 
 from google.api_core.exceptions import InvalidArgument, PermissionDenied
-from google.cloud.datacatalog import DataCatalogClient, enums
+from google.cloud import datacatalog
+from google.cloud.datacatalog import enums
 
 from quickstart import DataCatalogFacade
-
-from .bigquery import dataset, table
-from .datacatalog import table_entry, tag, tag_template
 
 TEST_ORGANIZATION_ID = os.environ['GOOGLE_CLOUD_TEST_ORGANIZATION_ID']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
-datacatalog = DataCatalogClient()
+datacatalog = datacatalog.DataCatalogClient()
 datacatalog_facade = DataCatalogFacade()
+
+
+def test_datacatalog_facade_search_catalog_bigquery_dataset_with_results(bigquery_dataset):
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset')
+    assert len(results) > 0
+    assert next(result for result in results if bigquery_dataset.dataset_id in result.linked_resource)
+
+
+def test_datacatalog_facade_search_catalog_bigquery_dataset_with_no_results():
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:abc_xyz')
+    assert len(results) == 0
+
+
+def test_datacatalog_facade_search_catalog_bigquery_table_column_with_results(bigquery_table):
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:email')
+    assert len(results) > 0
+    assert next(result for result in results if bigquery_table.table_id in result.linked_resource)
+
+
+def test_datacatalog_facade_search_catalog_bigquery_table_column_with_no_results():
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:abc_xyz')
+    assert len(results) == 0
+
+
+def test_datacatalog_facade_search_catalog_tag_template_with_results(datacatalog_tag):
+    entry_name = re.search('(.+?)/tags/(.+?)$', datacatalog_tag.name).group(1)
+    linked_resource = datacatalog_facade.get_entry(entry_name).linked_resource
+
+    template_id = re.search('(.+?)/tagTemplates/(.+?)$', datacatalog_tag.template).group(2)
+
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}')
+
+    assert len(results) > 0
+    assert next(result for result in results if linked_resource == result.linked_resource)
+
+
+def test_datacatalog_facade_search_catalog_tag_template_with_no_results():
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'tag:abc_xyz')
+    assert len(results) == 0
+
+
+def test_datacatalog_facade_search_catalog_tag_value_with_results(datacatalog_tag):
+    entry_name = re.search('(.+?)/tags/(.+?)$', datacatalog_tag.name).group(1)
+    linked_resource = datacatalog_facade.get_entry(entry_name).linked_resource
+
+    template_id = re.search('(.+?)/tagTemplates/(.+?)$', datacatalog_tag.template).group(2)
+
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}.double_field=10.5')
+
+    assert len(results) > 0
+    assert next(result for result in results if linked_resource == result.linked_resource)
+
+
+def test_datacatalog_facade_search_catalog_tag_value_with_no_results():
+    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'tag:quickstart.double_field=10.5')
+    assert len(results) == 0
+
+
+def test_datacatalog_facade_get_entry(bigquery_table):
+    results = datacatalog_facade.search_catalog(
+        TEST_ORGANIZATION_ID, f'system=bigquery type=table name:{bigquery_table.table_id}')
+
+    table_resource_name = f'//bigquery.googleapis.com/projects/{bigquery_table.project}'\
+                          f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}'
+    table_search_result = next(result for result in results if result.linked_resource == table_resource_name)
+
+    assert datacatalog.get_entry(name=table_search_result.relative_resource_name)
+
+
+def test_datacatalog_facade_get_entry_fail_invalid_argument(bigquery_table):
+    try:
+        datacatalog_facade.lookup_entry(
+            f'projects/{bigquery_table.project}/locations/US/entryGroups/@bigquery/entries/quickstart')
+        assert False
+    except InvalidArgument:
+        assert True
+
+
+def test_datacatalog_facade_lookup_entry(bigquery_table):
+    assert datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
+                                           f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
+
+
+def test_datacatalog_facade_lookup_entry_fail_permission_denied(bigquery_table):
+    try:
+        datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
+                                        f'/datasets/{bigquery_table.dataset_id}/tables/quickstart')
+        assert False
+    except PermissionDenied:
+        assert True
 
 
 def test_datacatalog_facade_create_tag_template():
@@ -51,9 +139,9 @@ def test_datacatalog_facade_create_tag_template():
     datacatalog.delete_tag_template(name=template.name, force=True)
 
 
-def test_datacatalog_facade_create_tag_template_field(tag_template):
+def test_datacatalog_facade_create_tag_template_field(datacatalog_tag_template):
     field = datacatalog_facade.create_tag_template_field(
-        template_name=tag_template.name,
+        template_name=datacatalog_tag_template.name,
         field_id='quickstart_test_tag_template_enum_field',
         display_name='Testing enum fields',
         enum_values=[
@@ -66,16 +154,16 @@ def test_datacatalog_facade_create_tag_template_field(tag_template):
 
     # Clean up.
     datacatalog.delete_tag_template_field(
-        name=f'{tag_template.name}/fields/quickstart_test_tag_template_enum_field', force=True)
+        name=f'{datacatalog_tag_template.name}/fields/quickstart_test_tag_template_enum_field', force=True)
 
 
-def test_datacatalog_facade_create_tag(table, tag_template):
-    entry = datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
-                                            f'/datasets/{table.dataset_id}/tables/{table.table_id}')
+def test_datacatalog_facade_create_tag(bigquery_table, datacatalog_tag_template):
+    entry = datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
+                                            f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
 
     tag = datacatalog_facade.create_tag(
         entry=entry,
-        tag_template=tag_template,
+        tag_template=datacatalog_tag_template,
         fields_descriptors=[
             {
                 'id': 'boolean_field',
@@ -109,93 +197,3 @@ def test_datacatalog_facade_create_tag(table, tag_template):
 
     # Clean up.
     datacatalog.delete_tag(name=tag.name)
-
-
-def test_datacatalog_facade_get_entry(table):
-    results = datacatalog_facade.search_catalog(
-        TEST_ORGANIZATION_ID, f'system=bigquery type=table name:{table.table_id}')
-
-    table_resource_name = f'//bigquery.googleapis.com/projects/{table.project}'\
-                          f'/datasets/{table.dataset_id}/tables/{table.table_id}'
-    table_search_result = next(result for result in results if result.linked_resource == table_resource_name)
-
-    assert datacatalog.get_entry(name=table_search_result.relative_resource_name)
-
-
-def test_datacatalog_facade_get_entry_fail_invalid_argument(table):
-    try:
-        datacatalog_facade.lookup_entry(
-            f'projects/{table.project}/locations/US/entryGroups/@bigquery/entries/quickstart')
-        assert False
-    except InvalidArgument:
-        assert True
-
-
-def test_datacatalog_facade_lookup_entry(table):
-    assert datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
-                                           f'/datasets/{table.dataset_id}/tables/{table.table_id}')
-
-
-def test_datacatalog_facade_lookup_entry_fail_permission_denied(table):
-    try:
-        datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{table.project}'
-                                        f'/datasets/{table.dataset_id}/tables/quickstart')
-        assert False
-    except PermissionDenied:
-        assert True
-
-
-def test_datacatalog_facade_search_catalog_bigquery_dataset_with_results(dataset):
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset')
-    assert len(results) > 0
-    assert next(result for result in results if dataset.dataset_id in result.linked_resource)
-
-
-def test_datacatalog_facade_search_catalog_bigquery_dataset_with_no_results():
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=dataset name:abc_xyz')
-    assert len(results) == 0
-
-
-def test_datacatalog_facade_search_catalog_bigquery_table_column_with_results(table):
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:email')
-    assert len(results) > 0
-    assert next(result for result in results if table.table_id in result.linked_resource)
-
-
-def test_datacatalog_facade_search_catalog_bigquery_table_column_with_no_results():
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'system=bigquery type=table column:abc_xyz')
-    assert len(results) == 0
-
-
-def test_datacatalog_facade_search_catalog_tag_template_with_results(tag):
-    entry_name = re.search('(.+?)/tags/(.+?)$', tag.name).group(1)
-    linked_resource = datacatalog_facade.get_entry(entry_name).linked_resource
-
-    template_id = re.search('(.+?)/tagTemplates/(.+?)$', tag.template).group(2)
-
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}')
-
-    assert len(results) > 0
-    assert next(result for result in results if linked_resource == result.linked_resource)
-
-
-def test_datacatalog_facade_search_catalog_tag_template_with_no_results():
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'tag:abc_xyz')
-    assert len(results) == 0
-
-
-def test_datacatalog_facade_search_catalog_tag_value_with_results(tag):
-    entry_name = re.search('(.+?)/tags/(.+?)$', tag.name).group(1)
-    linked_resource = datacatalog_facade.get_entry(entry_name).linked_resource
-
-    template_id = re.search('(.+?)/tagTemplates/(.+?)$', tag.template).group(2)
-
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, f'tag:{template_id}.double_field=10.5')
-    
-    assert len(results) > 0
-    assert next(result for result in results if linked_resource == result.linked_resource)
-
-
-def test_datacatalog_facade_search_catalog_tag_value_with_no_results():
-    results = datacatalog_facade.search_catalog(TEST_ORGANIZATION_ID, 'tag:quickstart.double_field=10.5')
-    assert len(results) == 0
