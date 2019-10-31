@@ -14,15 +14,16 @@ for further details.
 """
 import argparse
 
-from google.api_core.exceptions import PermissionDenied
-from google.cloud.datacatalog import DataCatalogClient, enums, types
+from google.api_core import exceptions
+from google.cloud import datacatalog
+from google.cloud.datacatalog import enums, types
 
 
 class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = DataCatalogClient()
+        self.__datacatalog = datacatalog.DataCatalogClient()
 
     def search_catalog(self, organization_id, query):
         """Search Data Catalog for a given organization."""
@@ -187,9 +188,9 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # Delete a Tag Template with the same name if it already exists.
     try:
         datacatalog_facade.delete_tag_template(
-            DataCatalogClient.tag_template_path(
+            datacatalog.DataCatalogClient.tag_template_path(
                 project=project_id, location='us-central1', tag_template='quickstart_classification_template'))
-    except PermissionDenied:
+    except exceptions.PermissionDenied:
         pass
 
     template = datacatalog_facade.create_tag_template(

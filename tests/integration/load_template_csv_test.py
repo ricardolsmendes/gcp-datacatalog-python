@@ -1,14 +1,14 @@
 import os
 
-from google.cloud.datacatalog import DataCatalogClient
+from google.cloud import datacatalog
 
-from load_template_csv import TemplateMaker
+import load_template_csv
 
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
 
 def test_tempate_maker_run():
-    TemplateMaker().run(
+    load_template_csv.TemplateMaker().run(
         files_folder=f'{os.getcwd()}/sample-input/load-template-csv',
         project_id=TEST_PROJECT_ID,
         template_id='template_abc',
@@ -19,11 +19,11 @@ def test_tempate_maker_run():
     main_template_name = f'{location_name}/tagTemplates/template_abc'
     multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
-    datacatalog = DataCatalogClient()
+    datacatalog_client = datacatalog.DataCatalogClient()
 
-    assert datacatalog.get_tag_template(name=main_template_name)
-    assert datacatalog.get_tag_template(name=multivalued_field_template_name)
+    assert datacatalog_client.get_tag_template(name=main_template_name)
+    assert datacatalog_client.get_tag_template(name=multivalued_field_template_name)
 
     # Clean up.
-    datacatalog.delete_tag_template(name=main_template_name, force=True)
-    datacatalog.delete_tag_template(name=multivalued_field_template_name, force=True)
+    datacatalog_client.delete_tag_template(name=main_template_name, force=True)
+    datacatalog_client.delete_tag_template(name=multivalued_field_template_name, force=True)

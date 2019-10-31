@@ -9,8 +9,9 @@ import re
 import stringcase
 import unicodedata
 
-from google.api_core.exceptions import PermissionDenied
-from google.cloud.datacatalog import DataCatalogClient, enums, types
+from google.api_core import exceptions
+from google.cloud import datacatalog
+from google.cloud.datacatalog import enums, types
 
 
 """
@@ -62,7 +63,8 @@ class TemplateMaker:
             names_from_file = CSVFilesReader.read_helper(files_folder, stringcase.spinalcase(field[0]))
             enums_names[field[0]] = [name[0] for name in names_from_file]
 
-        template_name = DataCatalogClient.tag_template_path(project_id, _CLOUD_PLATFORM_REGION, template_id)
+        template_name = datacatalog.DataCatalogClient.tag_template_path(
+            project_id, _CLOUD_PLATFORM_REGION, template_id)
 
         if delete_existing_template:
             self.__datacatalog_facade.delete_tag_template(template_name)
@@ -89,7 +91,7 @@ class TemplateMaker:
             custom_template_id = f'{template_id}_{field[0]}'
             custom_display_name = f'{display_name} - {field[1]}'
 
-            template_name = DataCatalogClient.tag_template_path(
+            template_name = datacatalog.DataCatalogClient.tag_template_path(
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
 
             if delete_existing_template:
@@ -170,12 +172,12 @@ class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = DataCatalogClient()
+        self.__datacatalog = datacatalog.DataCatalogClient()
 
     def create_tag_template(self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
         """Create a Tag Template."""
 
-        location = DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
+        location = datacatalog.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
 
         tag_template = types.TagTemplate()
         tag_template.display_name = display_name
@@ -203,7 +205,7 @@ class DataCatalogFacade:
         try:
             self.__datacatalog.delete_tag_template(name=name, force=True)
             logging.info(f'===> Template deleted: {name}')
-        except PermissionDenied:
+        except exceptions.PermissionDenied:
             pass
 
     def tag_template_exists(self, name):
@@ -212,7 +214,7 @@ class DataCatalogFacade:
         try:
             self.__datacatalog.get_tag_template(name=name)
             return True
-        except PermissionDenied:
+        except exceptions.PermissionDenied:
             return False
 
 
