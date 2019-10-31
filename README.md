@@ -71,15 +71,15 @@ export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
 Docker may be used as an alternative to run all the scripts. In this case please disregard the
 [Virtualenv](#23-virtualenv) install instructions. 
 
-### 2.5. End-to-end tests
+### 2.5. Integration tests
 
-Ent-to-end tests help to make sure Google Cloud APIs and Service Accounts IAM Roles have been properly set up before
+Integration tests help to make sure Google Cloud APIs and Service Accounts IAM Roles have been properly set up before
 running a script. They actually communicate with the APIs and create temporary resources that are deleted just after
 being used.
 
 ## 3. Quickstart
 
-### 3.1. e2e tests
+### 3.1. Integration tests
 
 - pytest
 
@@ -87,7 +87,7 @@ being used.
 export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID
 export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
 
-pytest tests_e2e/quickstart_test.py
+pytest ./tests/integration/quickstart_test.py
 ```
 
 - docker
@@ -98,7 +98,7 @@ docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
   gcp-datacatalog-python \
-  pytest tests_e2e/quickstart_test.py
+  pytest ./tests/integration/quickstart_test.py
 ```
 
 ### 3.2. quickstart.py
@@ -139,14 +139,14 @@ formatting job for you. So, just provide the IDs as strings.
 
 *TIP: keep all template-related files in the same folder (`sample-input/load-template-csv` for reference).*
 
-### 4.2. e2e tests
+### 4.2. Integration tests
 
 - pytest
 
 ```bash
 export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
 
-pytest tests_e2e/load_template_csv_test.py
+pytest ./tests/integration/load_template_csv_test.py
 ```
 
 - docker
@@ -156,7 +156,7 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
   gcp-datacatalog-python \
-  pytest tests_e2e/load_template_csv_test.py
+  pytest ./tests/integration/load_template_csv_test.py
 ```
 
 ### 4.3. load_template_csv.py
@@ -207,14 +207,14 @@ formatting job for you. So, just provide the IDs as strings.
 
 *TIP: keep all template-related sheets in the same document ([Data Catalog Sample Tag Template][7] for reference).*
 
-### 5.3. e2e tests
+### 5.3. Integration tests
 
 - pytest
 
 ```bash
 export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
 
-pytest tests_e2e/load_template_google_sheets_test.py
+pytest ./tests/integration/load_template_google_sheets_test.py
 ```
 
 - docker
@@ -224,7 +224,7 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
   gcp-datacatalog-python \
-  pytest tests_e2e/load_template_google_sheets_test.py
+  pytest ./tests/integration/load_template_google_sheets_test.py
 ```
 
 ### 5.4. load_template_google_sheets.py
