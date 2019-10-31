@@ -24,6 +24,28 @@ class DataCatalogFacade:
         # Initialize the API client.
         self.__datacatalog = DataCatalogClient()
 
+    def search_catalog(self, organization_id, query):
+        """Search Data Catalog for a given organization."""
+
+        scope = types.SearchCatalogRequest.Scope()
+        scope.include_org_ids.append(organization_id)
+
+        return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
+
+    @classmethod
+    def __fetch_search_results(cls, results_pages_iterator):
+        return [result for result in results_pages_iterator]
+
+    def get_entry(self, name):
+        """Get the Data Catalog Entry for a given name."""
+
+        return self.__datacatalog.get_entry(name=name)
+
+    def lookup_entry(self, linked_resource):
+        """Lookup the Data Catalog Entry for a given resource."""
+
+        return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
+
     def create_tag_template(self, project_id, template_id, display_name, primitive_fields_descriptors):
         """Create a Tag Template."""
 
@@ -38,16 +60,6 @@ class DataCatalogFacade:
 
         return self.__datacatalog.create_tag_template(
             parent=location, tag_template_id=template_id, tag_template=tag_template)
-
-    def get_tag_template(self, name):
-        """Get the Tag Template for a given name."""
-
-        return self.__datacatalog.get_tag_template(name=name)
-
-    def delete_tag_template(self, name):
-        """Delete a Tag Template."""
-
-        self.__datacatalog.delete_tag_template(name=name, force=True)
 
     def create_tag_template_field(self, template_name, field_id, display_name, enum_values):
         """Add field to a Tag Template."""
@@ -65,6 +77,16 @@ class DataCatalogFacade:
         """Delete a Tag Template field."""
 
         self.__datacatalog.delete_tag_template_field(name=name, force=True)
+
+    def get_tag_template(self, name):
+        """Get the Tag Template for a given name."""
+
+        return self.__datacatalog.get_tag_template(name=name)
+
+    def delete_tag_template(self, name):
+        """Delete a Tag Template."""
+
+        self.__datacatalog.delete_tag_template(name=name, force=True)
 
     def create_tag(self, entry, tag_template, fields_descriptors):
         """Create a Tag."""
@@ -117,28 +139,6 @@ class DataCatalogFacade:
         """Delete a Tag."""
 
         self.__datacatalog.delete_tag(name=name)
-
-    def get_entry(self, name):
-        """Get the Data Catalog Entry for a given name."""
-
-        return self.__datacatalog.get_entry(name=name)
-
-    def lookup_entry(self, linked_resource):
-        """Lookup the Data Catalog Entry for a given resource."""
-
-        return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
-
-    def search_catalog(self, organization_id, query):
-        """Search Data Catalog for a given organization."""
-
-        scope = types.SearchCatalogRequest.Scope()
-        scope.include_org_ids.append(organization_id)
-
-        return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
-
-    @classmethod
-    def __fetch_search_results(cls, results_pages_iterator):
-        return [result for result in results_pages_iterator]
 
 
 def __show_datacatalog_api_core_features(organization_id, project_id):
