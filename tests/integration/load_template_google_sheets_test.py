@@ -1,9 +1,9 @@
 import json
 import os
 
-from google.cloud.datacatalog import DataCatalogClient
+from google.cloud import datacatalog
 
-from load_template_google_sheets import TemplateMaker
+import load_template_google_sheets
 
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
@@ -12,7 +12,7 @@ def test_tempate_maker_run():
     with open(f'{os.getcwd()}/sample-input/load-template-google-sheets/template-abc.gsheet') as json_file:
         spreadsheet_id = json.load(json_file)['doc_id']
 
-    TemplateMaker().run(
+    load_template_google_sheets.TemplateMaker().run(
         spreadsheet_id=spreadsheet_id,
         project_id=TEST_PROJECT_ID,
         template_id='template_abc',
@@ -23,11 +23,11 @@ def test_tempate_maker_run():
     main_template_name = f'{location_name}/tagTemplates/template_abc'
     multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
-    datacatalog = DataCatalogClient()
+    datacatalog_client = datacatalog.DataCatalogClient()
 
-    assert datacatalog.get_tag_template(name=main_template_name)
-    assert datacatalog.get_tag_template(name=multivalued_field_template_name)
+    assert datacatalog_client.get_tag_template(name=main_template_name)
+    assert datacatalog_client.get_tag_template(name=multivalued_field_template_name)
 
     # Clean up.
-    datacatalog.delete_tag_template(name=main_template_name, force=True)
-    datacatalog.delete_tag_template(name=multivalued_field_template_name, force=True)
+    datacatalog_client.delete_tag_template(name=main_template_name, force=True)
+    datacatalog_client.delete_tag_template(name=multivalued_field_template_name, force=True)

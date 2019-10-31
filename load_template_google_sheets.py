@@ -8,11 +8,12 @@ import re
 import stringcase
 import unicodedata
 
-from google.api_core.exceptions import PermissionDenied
-from google.cloud.datacatalog import DataCatalogClient, enums, types
+from google.api_core import exceptions
+from google.cloud import datacatalog
+from google.cloud.datacatalog import enums, types
 from googleapiclient import discovery
-from googleapiclient.errors import HttpError
-from oauth2client.service_account import ServiceAccountCredentials
+from googleapiclient import errors
+from oauth2client import service_account
 
 
 """
@@ -64,7 +65,8 @@ class TemplateMaker:
             names_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(field[0]))
             enums_names[field[0]] = [name[0] for name in names_from_sheet]
 
-        template_name = DataCatalogClient.tag_template_path(project_id, _CLOUD_PLATFORM_REGION, template_id)
+        template_name = datacatalog.DataCatalogClient.tag_template_path(
+            project_id, _CLOUD_PLATFORM_REGION, template_id)
 
         if delete_existing_template:
             self.__datacatalog_facade.delete_tag_template(template_name)
@@ -84,7 +86,7 @@ class TemplateMaker:
                 values_from_sheet = self.__sheets_reader.read_helper(spreadsheet_id, stringcase.spinalcase(field[0]))
                 fields = [(StringFormatter.format_to_snakecase(value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
                           for value in values_from_sheet]
-            except HttpError as err:
+            except errors.HttpError as err:
                 if err.resp.status in [400]:
                     logging.info('NOT FOUND. Ignoring...')
                     continue  # Ignore creating a new template representing the multivalued field
@@ -94,7 +96,7 @@ class TemplateMaker:
             custom_template_id = f'{template_id}_{field[0]}'
             custom_display_name = f'{display_name} - {field[1]}'
 
-            template_name = DataCatalogClient.tag_template_path(
+            template_name = datacatalog.DataCatalogClient.tag_template_path(
                 project_id, _CLOUD_PLATFORM_REGION, custom_template_id)
 
             if delete_existing_template:
@@ -167,12 +169,12 @@ class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = DataCatalogClient()
+        self.__datacatalog = datacatalog.DataCatalogClient()
 
     def create_tag_template(self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
         """Create a Tag Template."""
 
-        location = DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
+        location = datacatalog.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
 
         tag_template = types.TagTemplate()
         tag_template.display_name = display_name
@@ -200,7 +202,7 @@ class DataCatalogFacade:
         try:
             self.__datacatalog.delete_tag_template(name=name, force=True)
             logging.info(f'===> Template deleted: {name}')
-        except PermissionDenied:
+        except exceptions.PermissionDenied:
             pass
 
     def tag_template_exists(self, name):
@@ -209,7 +211,7 @@ class DataCatalogFacade:
         try:
             self.__datacatalog.get_tag_template(name=name)
             return True
-        except PermissionDenied:
+        except exceptions.PermissionDenied:
             return False
 
 
@@ -222,7 +224,8 @@ class GoogleSheetsFacade:
         # Initialize the API client.
         self.__service = discovery.build(
             serviceName='sheets', version='v4',
-            credentials=ServiceAccountCredentials.get_application_default(), cache_discovery=False)
+            credentials=service_account.ServiceAccountCredentials.get_application_default(),
+            cache_discovery=False)
 
     def read_sheet(self, spreadsheet_id, sheet_name, values_per_line):
         return self.__service.spreadsheets().values().batchGet(

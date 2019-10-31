@@ -1,17 +1,17 @@
 import os
 import re
 
-from google.api_core.exceptions import InvalidArgument, PermissionDenied
+from google.api_core import exceptions
 from google.cloud import datacatalog
 from google.cloud.datacatalog import enums
 
-from quickstart import DataCatalogFacade
+import quickstart
 
 TEST_ORGANIZATION_ID = os.environ['GOOGLE_CLOUD_TEST_ORGANIZATION_ID']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
 datacatalog = datacatalog.DataCatalogClient()
-datacatalog_facade = DataCatalogFacade()
+datacatalog_facade = quickstart.DataCatalogFacade()
 
 
 def test_datacatalog_facade_search_catalog_bigquery_dataset_with_results(bigquery_dataset):
@@ -86,7 +86,7 @@ def test_datacatalog_facade_get_entry_fail_invalid_argument(bigquery_table):
         datacatalog_facade.lookup_entry(
             f'projects/{bigquery_table.project}/locations/US/entryGroups/@bigquery/entries/quickstart')
         assert False
-    except InvalidArgument:
+    except exceptions.InvalidArgument:
         assert True
 
 
@@ -100,7 +100,7 @@ def test_datacatalog_facade_lookup_entry_fail_permission_denied(bigquery_table):
         datacatalog_facade.lookup_entry(f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
                                         f'/datasets/{bigquery_table.dataset_id}/tables/quickstart')
         assert False
-    except PermissionDenied:
+    except exceptions.PermissionDenied:
         assert True
 
 

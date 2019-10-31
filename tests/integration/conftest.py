@@ -3,7 +3,7 @@ import pytest
 import time
 import uuid
 
-from google.api_core.exceptions import PermissionDenied
+from google.api_core import exceptions
 from google.cloud import bigquery
 from google.cloud import datacatalog
 from google.cloud.datacatalog import enums, types
@@ -85,7 +85,7 @@ def datacatalog_tag_template(scope='function'):
     try:
         datacatalog_client.delete_tag_template(
             name=f'{location}/tagTemplates/{__generate_uuid()}_quickstart_test_tag_template', force=True)
-    except PermissionDenied:
+    except exceptions.PermissionDenied:
         pass
 
     template = types.TagTemplate()
