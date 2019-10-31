@@ -1,7 +1,8 @@
 import os
-import pytest
 import time
 import uuid
+
+import pytest
 
 from google.api_core import exceptions
 from google.cloud import bigquery
