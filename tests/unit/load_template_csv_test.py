@@ -100,7 +100,7 @@ class TemplateMakerTest(unittest.TestCase):
 
 class CSVFilesReaderTest(unittest.TestCase):
 
-    @mock.patch('builtins.open', new_callable=mock.mock_open())
+    @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
     def test_read_master_should_return_content_as_list(self, mock_builtins_open):
         mock_builtins_open.return_value = io.StringIO(
             'col1,col2,col3\n'
@@ -114,7 +114,7 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual(3, len(content[0]))
         self.assertEqual('val2', content[0][1])
 
-    @mock.patch('builtins.open', new_callable=mock.mock_open())
+    @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
     def test_read_helper_should_return_content_as_list(self, mock_builtins_open):
         mock_builtins_open.return_value = io.StringIO(
             'col1\n'
@@ -128,7 +128,7 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual(1, len(content[0]))
         self.assertEqual('val1', content[0][0])
 
-    @mock.patch('builtins.open', new_callable=mock.mock_open())
+    @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
     def test_read_should_return_exact_number_values_per_line(self, mock_builtins_open):
         mock_builtins_open.return_value = io.StringIO(
             'col1,col2,col3\n'
@@ -139,7 +139,7 @@ class CSVFilesReaderTest(unittest.TestCase):
 
         self.assertEqual(2, len(content[0]))
 
-    @mock.patch('builtins.open', new_callable=mock.mock_open())
+    @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
     def test_read_should_return_stripped_content(self, mock_builtins_open):
         mock_builtins_open.return_value = io.StringIO(
             'col1,col2,col3\n'
