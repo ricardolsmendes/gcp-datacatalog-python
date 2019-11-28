@@ -17,17 +17,20 @@ jobs:
           name: Set up a virtual environment
           command: |
             python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
 
       - restore_cache: # Download and cache dependencies.
           key: dependency-cache-{{ checksum "requirements.txt" }}
 
       - run:
+          name: Install/upgrade pip and setup-related packages
+          command: |
+            . venv/bin/activate
+            pip install --upgrade pip setuptools wheel
+
+      - run:
           name: Install dependencies
           command: |
             . venv/bin/activate
-            pip install --upgrade setuptools wheel
             pip install -r requirements.txt
 
       - save_cache: # Special step to save the dependency cache.
