@@ -43,16 +43,20 @@ class TemplateMaker:
         self.__datacatalog_facade = DataCatalogFacade()
 
     def run(self, files_folder, project_id, template_id, display_name, delete_existing=False):
-        master_template_fields = CSVFilesReader.read_master(files_folder, stringcase.spinalcase(template_id))
+        master_template_fields = CSVFilesReader.read_master(
+            files_folder, stringcase.spinalcase(template_id))
         self.__process_native_fields(files_folder, project_id, template_id, display_name,
                                      master_template_fields, delete_existing)
-        self.__process_custom_multivalued_fields(files_folder, project_id, template_id, display_name,
-                                                 master_template_fields, delete_existing)
+        self.__process_custom_multivalued_fields(
+            files_folder, project_id, template_id, display_name, master_template_fields,
+            delete_existing)
 
-    def __process_native_fields(self, files_folder, project_id, template_id, display_name,
-                                master_template_fields, delete_existing_template):
+    def __process_native_fields(
+            self, files_folder, project_id, template_id, display_name, master_template_fields,
+            delete_existing_template):
 
-        native_fields = self.__filter_fields_by_types(master_template_fields, _DATA_CATALOG_NATIVE_TYPES)
+        native_fields = self.__filter_fields_by_types(
+            master_template_fields, _DATA_CATALOG_NATIVE_TYPES)
         StringFormatter.format_elements_to_snakecase(native_fields, 0)
 
         enums_names = {}
@@ -60,7 +64,8 @@ class TemplateMaker:
             if not field[2] == _DATA_CATALOG_ENUM_TYPE:
                 continue
 
-            names_from_file = CSVFilesReader.read_helper(files_folder, stringcase.spinalcase(field[0]))
+            names_from_file = CSVFilesReader.read_helper(
+                files_folder, stringcase.spinalcase(field[0]))
             enums_names[field[0]] = [name[0] for name in names_from_file]
 
         template_name = datacatalog.DataCatalogClient.tag_template_path(
@@ -73,16 +78,20 @@ class TemplateMaker:
             self.__datacatalog_facade.create_tag_template(
                 project_id, template_id, display_name, native_fields, enums_names)
 
-    def __process_custom_multivalued_fields(self, files_folder, project_id, template_id, display_name,
-                                            master_template_fields, delete_existing_template):
+    def __process_custom_multivalued_fields(
+            self, files_folder, project_id, template_id, display_name, master_template_fields,
+            delete_existing_template):
 
-        multivalued_fields = self.__filter_fields_by_types(master_template_fields, [_CUSTOM_MULTIVALUED_TYPE])
+        multivalued_fields = self.__filter_fields_by_types(
+            master_template_fields, [_CUSTOM_MULTIVALUED_TYPE])
         StringFormatter.format_elements_to_snakecase(multivalued_fields, 0)
 
         for field in multivalued_fields:
             try:
-                values_from_file = CSVFilesReader.read_helper(files_folder, stringcase.spinalcase(field[0]))
-                fields = [(StringFormatter.format_to_snakecase(value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
+                values_from_file = CSVFilesReader.read_helper(
+                    files_folder, stringcase.spinalcase(field[0]))
+                fields = [(StringFormatter.format_to_snakecase(
+                            value[0]), value[0], _DATA_CATALOG_BOOL_TYPE)
                           for value in values_from_file]
             except FileNotFoundError:
                 logging.info('NOT FOUND. Ignoring...')
@@ -174,7 +183,8 @@ class DataCatalogFacade:
         # Initialize the API client.
         self.__datacatalog = datacatalog.DataCatalogClient()
 
-    def create_tag_template(self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
+    def create_tag_template(
+            self, project_id, template_id, display_name, fields_descriptors, enums_names=None):
         """Create a Tag Template."""
 
         location = datacatalog.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
@@ -189,10 +199,12 @@ class DataCatalogFacade:
             tag_template.fields[field_id].display_name = descriptor[1]
 
             if not field_type == _DATA_CATALOG_ENUM_TYPE:
-                tag_template.fields[field_id].type.primitive_type = enums.FieldType.PrimitiveType[field_type]
+                tag_template.fields[field_id].type.primitive_type = \
+                    enums.FieldType.PrimitiveType[field_type]
             else:
                 for enum_name in enums_names[field_id]:
-                    tag_template.fields[field_id].type.enum_type.allowed_values.add().display_name = enum_name
+                    fields = tag_template.fields
+                    fields[field_id].type.enum_type.allowed_values.add().display_name = enum_name
 
         created_tag_template = self.__datacatalog.create_tag_template(
             parent=location, tag_template_id=template_id, tag_template=tag_template)
@@ -240,7 +252,8 @@ class StringFormatter:
         normalized_str = unicodedata.normalize('NFKD', string).encode('ASCII', 'ignore').decode()
         normalized_str = re.sub(r'[^a-zA-Z0-9]+', ' ', normalized_str)
         normalized_str = normalized_str.strip()
-        normalized_str = normalized_str.lower() if (' ' in normalized_str) or (normalized_str.isupper()) \
+        normalized_str = normalized_str.lower() \
+            if (' ' in normalized_str) or (normalized_str.isupper()) \
             else stringcase.camelcase(normalized_str)  # FooBarBaz => fooBarBaz
 
         return stringcase.snakecase(normalized_str)  # foo-bar-baz => foo_bar_baz
@@ -257,11 +270,15 @@ if __name__ == "__main__":
 
     parser.add_argument('--template-id', help='the template ID', required=True)
     parser.add_argument('--display-name', help='template\'s Display Name', required=True)
-    parser.add_argument('--project-id', help='GCP Project in which the Template will be created', required=True)
+    parser.add_argument(
+        '--project-id', help='GCP Project in which the Template will be created', required=True)
     parser.add_argument('--files-folder', help='path to CSV files container folder', required=True)
-    parser.add_argument('--delete-existing', action='store_true',
-                        help='delete existing Templates and recreate them with the provided metadata')
+    parser.add_argument(
+        '--delete-existing', action='store_true',
+        help='delete existing Templates and recreate them with the provided metadata')
 
     args = parser.parse_args()
 
-    TemplateMaker().run(args.files_folder, args.project_id, args.template_id, args.display_name, args.delete_existing)
+    TemplateMaker().run(
+        args.files_folder, args.project_id, args.template_id, args.display_name,
+        args.delete_existing)

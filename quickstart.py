@@ -9,7 +9,7 @@ Before using it, make sure the Google Cloud Project contains below BigQuery asse
         - email: STRING [column]
 
 Please refer to
-https://medium.com/google-cloud/data-catalog-hands-on-guide-search-get-lookup-with-python-82d99bfb4056
+medium.com/google-cloud/data-catalog-hands-on-guide-search-get-lookup-with-python-82d99bfb4056
 for further details.
 """
 import argparse
@@ -31,7 +31,8 @@ class DataCatalogFacade:
         scope = types.SearchCatalogRequest.Scope()
         scope.include_org_ids.append(organization_id)
 
-        return self.__fetch_search_results(self.__datacatalog.search_catalog(scope=scope, query=query))
+        return self.__fetch_search_results(
+            self.__datacatalog.search_catalog(scope=scope, query=query))
 
     @classmethod
     def __fetch_search_results(cls, results_pages_iterator):
@@ -47,7 +48,8 @@ class DataCatalogFacade:
 
         return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
 
-    def create_tag_template(self, project_id, template_id, display_name, primitive_fields_descriptors):
+    def create_tag_template(
+            self, project_id, template_id, display_name, primitive_fields_descriptors):
         """Create a Tag Template."""
 
         location = self.__datacatalog.location_path(project_id, 'us-central1')
@@ -56,7 +58,8 @@ class DataCatalogFacade:
         tag_template.display_name = display_name
 
         for descriptor in primitive_fields_descriptors:
-            tag_template.fields[descriptor['id']].type.primitive_type = descriptor['primitive_type']
+            tag_template.fields[descriptor['id']].type.primitive_type = \
+                descriptor['primitive_type']
             tag_template.fields[descriptor['id']].display_name = descriptor['display_name']
 
         return self.__datacatalog.create_tag_template(
@@ -189,7 +192,8 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     try:
         datacatalog_facade.delete_tag_template(
             datacatalog.DataCatalogClient.tag_template_path(
-                project=project_id, location='us-central1', tag_template='quickstart_classification_template'))
+                project=project_id, location='us-central1',
+                tag_template='quickstart_classification_template'))
     except exceptions.PermissionDenied:
         pass
 

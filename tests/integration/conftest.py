@@ -35,7 +35,8 @@ def bigquery_dataset():
 
 @pytest.fixture
 def bigquery_table(bigquery_dataset):
-    name = f'{TEST_PROJECT_ID}.{bigquery_dataset.dataset_id}.{__generate_uuid()}_quickstart_test_table'
+    name = f'{TEST_PROJECT_ID}.{bigquery_dataset.dataset_id}' \
+           f'.{__generate_uuid()}_quickstart_test_table'
     schema = [
         bigquery.SchemaField('name', 'STRING', 'REQUIRED'),
         bigquery.SchemaField('email', 'STRING', 'REQUIRED')
@@ -85,7 +86,8 @@ def datacatalog_tag_template():
     # Delete a Tag Template with the same name if it already exists.
     try:
         datacatalog_client.delete_tag_template(
-            name=f'{location}/tagTemplates/{__generate_uuid()}_quickstart_test_tag_template', force=True)
+            name=f'{location}/tagTemplates/'
+                 f'{__generate_uuid()}_quickstart_test_tag_template', force=True)
     except exceptions.PermissionDenied:
         pass
 
@@ -93,7 +95,8 @@ def datacatalog_tag_template():
     template.fields['boolean_field'].type.primitive_type = enums.FieldType.PrimitiveType.BOOL
     template.fields['double_field'].type.primitive_type = enums.FieldType.PrimitiveType.DOUBLE
     template.fields['string_field'].type.primitive_type = enums.FieldType.PrimitiveType.STRING
-    template.fields['timestamp_field'].type.primitive_type = enums.FieldType.PrimitiveType.TIMESTAMP
+    template.fields['timestamp_field'].type.primitive_type = \
+        enums.FieldType.PrimitiveType.TIMESTAMP
 
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 1'
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 2'

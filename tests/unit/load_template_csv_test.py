@@ -21,68 +21,86 @@ class TemplateMakerTest(unittest.TestCase):
 
     def test_run_should_create_master_template_with_primitive_fields(self, mock_csv_files_reader):
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'BOOL']]
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template')
 
         mock_csv_files_reader.read_master.assert_called_once()
-        self.__datacatalog_facade.tag_template_exists.assert_called_once()
-        self.__datacatalog_facade.create_tag_template.assert_called_once()
+        datacatalog_facade.tag_template_exists.assert_called_once()
+        datacatalog_facade.create_tag_template.assert_called_once()
 
     def test_run_should_create_master_template_with_enum_fields(self, mock_csv_files_reader):
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'ENUM']]
         mock_csv_files_reader.read_helper.return_value = [['helper_val1']]
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template')
 
         mock_csv_files_reader.read_helper.assert_called_once()
 
     def test_run_should_create_helper_template_for_multivalued_fields(self, mock_csv_files_reader):
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'MULTI']]
         mock_csv_files_reader.read_helper.return_value = [['helper_val1']]
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template',
-            delete_existing=True)
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template', delete_existing=True)
 
         mock_csv_files_reader.read_helper.assert_called_once()
         # Both master and helper Templates are created.
-        self.assertEqual(2, self.__datacatalog_facade.create_tag_template.call_count)
+        self.assertEqual(2, datacatalog_facade.create_tag_template.call_count)
 
-    def test_run_should_ignore_template_for_multivalued_fields_if_file_not_found(self, mock_csv_files_reader):
+    def test_run_should_ignore_template_for_multivalued_fields_if_file_not_found(
+            self, mock_csv_files_reader):
+
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'MULTI']]
         mock_csv_files_reader.read_helper.side_effect = FileNotFoundError()
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template')
 
         mock_csv_files_reader.read_helper.assert_called_once()
         # Only the master Template is created.
-        self.__datacatalog_facade.create_tag_template.assert_called_once()
+        datacatalog_facade.create_tag_template.assert_called_once()
 
     def test_run_should_not_delete_existing_template_by_default(self, mock_csv_files_reader):
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'BOOL']]
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template')
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template')
 
-        self.__datacatalog_facade.delete_tag_template.assert_not_called()
+        datacatalog_facade.delete_tag_template.assert_not_called()
 
     def test_run_should_delete_existing_template_if_flag_set(self, mock_csv_files_reader):
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'BOOL']]
-        self.__datacatalog_facade.tag_template_exists.return_value = False
+
+        datacatalog_facade = self.__datacatalog_facade
+        datacatalog_facade.tag_template_exists.return_value = False
 
         self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id', display_name='Test Template',
-            delete_existing=True)
+            files_folder=None, project_id=None, template_id='test-template-id',
+            display_name='Test Template', delete_existing=True)
 
-        self.__datacatalog_facade.delete_tag_template.assert_called_once()
+        datacatalog_facade.delete_tag_template.assert_called_once()
 
 
 @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
@@ -156,27 +174,39 @@ class DataCatalogFacadeTest(unittest.TestCase):
             enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']}
         )
 
-        self.__datacatalog_client.create_tag_template.assert_called_once()
+        datacatalog_client = self.__datacatalog_client
+        datacatalog_client.create_tag_template.assert_called_once()
 
     def test_delete_tag_template_should_call_client_library_method(self):
         self.__datacatalog_facade.delete_tag_template('template_name')
-        self.__datacatalog_client.delete_tag_template.assert_called_once()
+
+        datacatalog_client = self.__datacatalog_client
+        datacatalog_client.delete_tag_template.assert_called_once()
 
     def test_delete_tag_template_should_handle_nonexistent(self):
-        self.__datacatalog_client.delete_tag_template.side_effect = exceptions.PermissionDenied(message='')
+        datacatalog_client = self.__datacatalog_client
+        datacatalog_client.delete_tag_template.side_effect = \
+            exceptions.PermissionDenied(message='')
+
         self.__datacatalog_facade.delete_tag_template('template_name')
-        self.__datacatalog_client.delete_tag_template.assert_called_once()
+
+        datacatalog_client.delete_tag_template.assert_called_once()
 
     def test_tag_template_exists_should_return_true_existing(self):
         tag_template_exists = self.__datacatalog_facade.tag_template_exists('template_name')
+
         self.assertTrue(tag_template_exists)
-        self.__datacatalog_client.get_tag_template.assert_called_once()
+        datacatalog_client = self.__datacatalog_client
+        datacatalog_client.get_tag_template.assert_called_once()
 
     def test_tag_template_exists_should_return_false_nonexistent(self):
-        self.__datacatalog_client.get_tag_template.side_effect = exceptions.PermissionDenied(message='')
+        datacatalog_client = self.__datacatalog_client
+        datacatalog_client.get_tag_template.side_effect = exceptions.PermissionDenied(message='')
+
         tag_template_exists = self.__datacatalog_facade.tag_template_exists('template_name')
+
         self.assertFalse(tag_template_exists)
-        self.__datacatalog_client.get_tag_template.assert_called_once()
+        datacatalog_client.get_tag_template.assert_called_once()
 
 
 class StringFormatterTest(unittest.TestCase):
@@ -193,13 +223,16 @@ class StringFormatterTest(unittest.TestCase):
 
     def test_format_string_to_snakecase_abbreviation(self):
         self.assertEqual('aaa', load_template_csv.StringFormatter.format_to_snakecase('AAA'))
-        self.assertEqual('aaa_aaa', load_template_csv.StringFormatter.format_to_snakecase('AAA-AAA'))
+        self.assertEqual(
+            'aaa_aaa', load_template_csv.StringFormatter.format_to_snakecase('AAA-AAA'))
 
     def test_format_string_to_snakecase_camelcase(self):
-        self.assertEqual('camel_case', load_template_csv.StringFormatter.format_to_snakecase('camelCase'))
+        self.assertEqual(
+            'camel_case', load_template_csv.StringFormatter.format_to_snakecase('camelCase'))
 
     def test_format_string_to_snakecase_leading_number(self):
-        self.assertEqual('1_number', load_template_csv.StringFormatter.format_to_snakecase('1 number'))
+        self.assertEqual(
+            '1_number', load_template_csv.StringFormatter.format_to_snakecase('1 number'))
 
     def test_format_string_to_snakecase_repeated_special_chars(self):
         self.assertEqual(
@@ -216,13 +249,18 @@ class StringFormatterTest(unittest.TestCase):
 
     def test_format_string_to_snakecase_special_chars(self):
         self.assertEqual(
-            'special_chars', load_template_csv.StringFormatter.format_to_snakecase('special!#@-_ chars'))
+            'special_chars',
+            load_template_csv.StringFormatter.format_to_snakecase('special!#@-_ chars'))
         self.assertEqual(
-            'special_chars', load_template_csv.StringFormatter.format_to_snakecase('! special chars ?'))
+            'special_chars',
+            load_template_csv.StringFormatter.format_to_snakecase('! special chars ?'))
 
     def test_format_string_to_snakecase_unicode(self):
-        self.assertEqual('a_a_e_o_u', load_template_csv.StringFormatter.format_to_snakecase(u'å ä ß é ö ü'))
+        self.assertEqual(
+            'a_a_e_o_u', load_template_csv.StringFormatter.format_to_snakecase(u'å ä ß é ö ü'))
 
     def test_format_string_to_snakecase_uppercase(self):
-        self.assertEqual('uppercase', load_template_csv.StringFormatter.format_to_snakecase('UPPERCASE'))
-        self.assertEqual('upper_case', load_template_csv.StringFormatter.format_to_snakecase('UPPER CASE'))
+        self.assertEqual(
+            'uppercase', load_template_csv.StringFormatter.format_to_snakecase('UPPERCASE'))
+        self.assertEqual(
+            'upper_case', load_template_csv.StringFormatter.format_to_snakecase('UPPER CASE'))

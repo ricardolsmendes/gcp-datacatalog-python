@@ -9,7 +9,8 @@ TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
 
 def test_tempate_maker_run():
-    with open(f'{os.getcwd()}/sample-input/load-template-google-sheets/template-abc.gsheet') as json_file:
+    with open(f'{os.getcwd()}/sample-input/load-template-google-sheets/template-abc.gsheet') \
+            as json_file:
         spreadsheet_id = json.load(json_file)['doc_id']
 
     load_template_google_sheets.TemplateMaker().run(
@@ -21,7 +22,8 @@ def test_tempate_maker_run():
 
     location_name = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
     main_template_name = f'{location_name}/tagTemplates/template_abc'
-    multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
+    multivalued_field_template_name = \
+        f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
     datacatalog_client = datacatalog.DataCatalogClient()
 

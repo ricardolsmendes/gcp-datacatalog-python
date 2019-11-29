@@ -17,7 +17,8 @@ def test_tempate_maker_run():
 
     location_name = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
     main_template_name = f'{location_name}/tagTemplates/template_abc'
-    multivalued_field_template_name = f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
+    multivalued_field_template_name = \
+        f'{location_name}/tagTemplates/template_abc_multivalued_field_xyz'
 
     datacatalog_client = datacatalog.DataCatalogClient()
 
