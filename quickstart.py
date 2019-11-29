@@ -20,7 +20,6 @@ from google.cloud.datacatalog import enums, types
 
 
 class DataCatalogFacade:
-
     def __init__(self):
         # Initialize the API client.
         self.__datacatalog = datacatalog.DataCatalogClient()
@@ -48,8 +47,8 @@ class DataCatalogFacade:
 
         return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
 
-    def create_tag_template(
-            self, project_id, template_id, display_name, primitive_fields_descriptors):
+    def create_tag_template(self, project_id, template_id, display_name,
+                            primitive_fields_descriptors):
         """Create a Tag Template."""
 
         location = self.__datacatalog.location_path(project_id, 'us-central1')
@@ -62,8 +61,9 @@ class DataCatalogFacade:
                 descriptor['primitive_type']
             tag_template.fields[descriptor['id']].display_name = descriptor['display_name']
 
-        return self.__datacatalog.create_tag_template(
-            parent=location, tag_template_id=template_id, tag_template=tag_template)
+        return self.__datacatalog.create_tag_template(parent=location,
+                                                      tag_template_id=template_id,
+                                                      tag_template=tag_template)
 
     def create_tag_template_field(self, template_name, field_id, display_name, enum_values):
         """Add field to a Tag Template."""
@@ -74,8 +74,9 @@ class DataCatalogFacade:
         for enum_value in enum_values:
             field.type.enum_type.allowed_values.add().display_name = enum_value['display_name']
 
-        return self.__datacatalog.create_tag_template_field(
-            parent=template_name, tag_template_field_id=field_id, tag_template_field=field)
+        return self.__datacatalog.create_tag_template_field(parent=template_name,
+                                                            tag_template_field_id=field_id,
+                                                            tag_template_field=field)
 
     def delete_tag_template_field(self, name):
         """Delete a Tag Template field."""
@@ -99,8 +100,8 @@ class DataCatalogFacade:
         tag.template = tag_template.name
 
         for descriptor in fields_descriptors:
-            self.__set_tag_field_value(
-                tag.fields[descriptor['id']], descriptor['value'], descriptor['primitive_type'])
+            self.__set_tag_field_value(tag.fields[descriptor['id']], descriptor['value'],
+                                       descriptor['primitive_type'])
 
         return self.__datacatalog.create_tag(parent=entry.name, tag=tag)
 
@@ -192,38 +193,35 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     try:
         datacatalog_facade.delete_tag_template(
             datacatalog.DataCatalogClient.tag_template_path(
-                project=project_id, location='us-central1',
+                project=project_id,
+                location='us-central1',
                 tag_template='quickstart_classification_template'))
     except exceptions.PermissionDenied:
         pass
+
+    primitive_fields_descriptors = [{
+        'id': 'has_pii',
+        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'display_name': 'Has PII'
+    }]
 
     template = datacatalog_facade.create_tag_template(
         project_id=project_id,
         template_id='quickstart_classification_template',
         display_name='A Tag Template to be used in the hands-on guide',
-        primitive_fields_descriptors=[
-            {
-                'id': 'has_pii',
-                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
-                'display_name': 'Has PII'
-            }
-        ]
-    )
+        primitive_fields_descriptors=primitive_fields_descriptors)
 
     print(template)
 
     # ================================================================================
     # 6. Add a field to the tag template.
     # ================================================================================
-    datacatalog_facade.create_tag_template_field(
-        template_name=template.name,
-        field_id='pii_type',
-        display_name='PII Type',
-        enum_values=[
-            {'display_name': 'EMAIL'},
-            {'display_name': 'SOCIAL SECURITY NUMBER'}
-        ]
-    )
+    enum_values = [{'display_name': 'EMAIL'}, {'display_name': 'SOCIAL SECURITY NUMBER'}]
+
+    datacatalog_facade.create_tag_template_field(template_name=template.name,
+                                                 field_id='pii_type',
+                                                 display_name='PII Type',
+                                                 enum_values=enum_values)
 
     template = datacatalog_facade.get_tag_template(template.name)
     print(template)
@@ -231,39 +229,34 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     # 7. Create a tag to table_1 catalog entry.
     # ================================================================================
-    tag_entry_table_1 = datacatalog_facade.create_tag(
-        entry=table_1_entry,
-        tag_template=template,
-        fields_descriptors=[
-            {
-                'id': 'has_pii',
-                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
-                'value': False
-            }
-        ]
-    )
+    fields_descriptors = [{
+        'id': 'has_pii',
+        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'value': False
+    }]
+
+    tag_entry_table_1 = datacatalog_facade.create_tag(entry=table_1_entry,
+                                                      tag_template=template,
+                                                      fields_descriptors=fields_descriptors)
 
     print(tag_entry_table_1)
 
     # ================================================================================
     # 8. Create a tag to table_2 catalog entry.
     # ================================================================================
-    tag_entry_table_2 = datacatalog_facade.create_tag(
-        entry=table_2_entry,
-        tag_template=template,
-        fields_descriptors=[
-            {
-                'id': 'has_pii',
-                'primitive_type': enums.FieldType.PrimitiveType.BOOL,
-                'value': True
-            },
-            {
-                'id': 'pii_type',
-                'primitive_type': None,
-                'value': 'EMAIL'
-            }
-        ]
-    )
+    fields_descriptors = [{
+        'id': 'has_pii',
+        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'value': True
+    }, {
+        'id': 'pii_type',
+        'primitive_type': None,
+        'value': 'EMAIL'
+    }]
+
+    tag_entry_table_2 = datacatalog_facade.create_tag(entry=table_2_entry,
+                                                      tag_template=template,
+                                                      fields_descriptors=fields_descriptors)
 
     print(tag_entry_table_2)
 
@@ -289,10 +282,8 @@ Main program entry point
 ========================================
 """
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('--organization-id', help='Google Cloud Organization ID', required=True)
     parser.add_argument('--project-id', help='Google Cloud Project ID', required=True)

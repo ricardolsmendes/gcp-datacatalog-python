@@ -9,7 +9,6 @@ import load_template_csv
 
 @mock.patch('load_template_csv.CSVFilesReader')
 class TemplateMakerTest(unittest.TestCase):
-
     @mock.patch('load_template_csv.DataCatalogFacade')
     def setUp(self, mock_datacatalog_facade):
         self.__template_maker = load_template_csv.TemplateMaker()
@@ -25,9 +24,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         mock_csv_files_reader.read_master.assert_called_once()
         datacatalog_facade.tag_template_exists.assert_called_once()
@@ -40,9 +40,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         mock_csv_files_reader.read_helper.assert_called_once()
 
@@ -53,16 +54,18 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template', delete_existing=True)
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template',
+                                  delete_existing=True)
 
         mock_csv_files_reader.read_helper.assert_called_once()
         # Both master and helper Templates are created.
         self.assertEqual(2, datacatalog_facade.create_tag_template.call_count)
 
     def test_run_should_ignore_template_for_multivalued_fields_if_file_not_found(
-            self, mock_csv_files_reader):
+        self, mock_csv_files_reader):  # noqa
 
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'MULTI']]
         mock_csv_files_reader.read_helper.side_effect = FileNotFoundError()
@@ -70,9 +73,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         mock_csv_files_reader.read_helper.assert_called_once()
         # Only the master Template is created.
@@ -84,9 +88,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         datacatalog_facade.delete_tag_template.assert_not_called()
 
@@ -96,16 +101,17 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            files_folder=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template', delete_existing=True)
+        self.__template_maker.run(files_folder=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template',
+                                  delete_existing=True)
 
         datacatalog_facade.delete_tag_template.assert_called_once()
 
 
 @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
 class CSVFilesReaderTest(unittest.TestCase):
-
     def test_read_master_should_return_content_as_list(self, mock_open):
         mock_open.return_value = io.StringIO(
             'col1,col2,col3\n'
@@ -152,7 +158,6 @@ class CSVFilesReaderTest(unittest.TestCase):
 
 
 class DataCatalogFacadeTest(unittest.TestCase):
-
     @mock.patch('load_template_csv.datacatalog.DataCatalogClient')
     def setUp(self, mock_datacatalog_client):
         self.__datacatalog_facade = load_template_csv.DataCatalogFacade()
@@ -210,7 +215,6 @@ class DataCatalogFacadeTest(unittest.TestCase):
 
 
 class StringFormatterTest(unittest.TestCase):
-
     def test_format_elements_snakecase_list(self):
         test_list = ['AA-AA', 'BB-BB']
         load_template_csv.StringFormatter.format_elements_to_snakecase(test_list)
@@ -223,16 +227,16 @@ class StringFormatterTest(unittest.TestCase):
 
     def test_format_string_to_snakecase_abbreviation(self):
         self.assertEqual('aaa', load_template_csv.StringFormatter.format_to_snakecase('AAA'))
-        self.assertEqual(
-            'aaa_aaa', load_template_csv.StringFormatter.format_to_snakecase('AAA-AAA'))
+        self.assertEqual('aaa_aaa',
+                         load_template_csv.StringFormatter.format_to_snakecase('AAA-AAA'))
 
     def test_format_string_to_snakecase_camelcase(self):
-        self.assertEqual(
-            'camel_case', load_template_csv.StringFormatter.format_to_snakecase('camelCase'))
+        self.assertEqual('camel_case',
+                         load_template_csv.StringFormatter.format_to_snakecase('camelCase'))
 
     def test_format_string_to_snakecase_leading_number(self):
-        self.assertEqual(
-            '1_number', load_template_csv.StringFormatter.format_to_snakecase('1 number'))
+        self.assertEqual('1_number',
+                         load_template_csv.StringFormatter.format_to_snakecase('1 number'))
 
     def test_format_string_to_snakecase_repeated_special_chars(self):
         self.assertEqual(
@@ -256,11 +260,11 @@ class StringFormatterTest(unittest.TestCase):
             load_template_csv.StringFormatter.format_to_snakecase('! special chars ?'))
 
     def test_format_string_to_snakecase_unicode(self):
-        self.assertEqual(
-            'a_a_e_o_u', load_template_csv.StringFormatter.format_to_snakecase(u'å ä ß é ö ü'))
+        self.assertEqual('a_a_e_o_u',
+                         load_template_csv.StringFormatter.format_to_snakecase(u'å ä ß é ö ü'))
 
     def test_format_string_to_snakecase_uppercase(self):
-        self.assertEqual(
-            'uppercase', load_template_csv.StringFormatter.format_to_snakecase('UPPERCASE'))
-        self.assertEqual(
-            'upper_case', load_template_csv.StringFormatter.format_to_snakecase('UPPER CASE'))
+        self.assertEqual('uppercase',
+                         load_template_csv.StringFormatter.format_to_snakecase('UPPERCASE'))
+        self.assertEqual('upper_case',
+                         load_template_csv.StringFormatter.format_to_snakecase('UPPER CASE'))
