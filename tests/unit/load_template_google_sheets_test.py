@@ -9,6 +9,7 @@ import load_template_google_sheets
 
 
 class TemplateMakerTest(unittest.TestCase):
+
     @mock.patch('load_template_google_sheets.DataCatalogFacade')
     @mock.patch('load_template_google_sheets.GoogleSheetsReader')
     def setUp(self, mock_sheets_reader, mock_datacatalog_facade):
@@ -141,6 +142,7 @@ class TemplateMakerTest(unittest.TestCase):
 
 
 class GoogleSheetsReaderTest(unittest.TestCase):
+
     @mock.patch('load_template_google_sheets.GoogleSheetsFacade')
     def setUp(self, mock_sheets_facade):
         self.__sheets_reader = load_template_google_sheets.GoogleSheetsReader()
@@ -214,6 +216,7 @@ class GoogleSheetsReaderTest(unittest.TestCase):
 
 
 class DataCatalogFacadeTest(unittest.TestCase):
+
     @mock.patch('load_template_google_sheets.datacatalog.DataCatalogClient')
     def setUp(self, mock_datacatalog_client):
         self.__datacatalog_facade = load_template_google_sheets.DataCatalogFacade()
@@ -272,6 +275,7 @@ class DataCatalogFacadeTest(unittest.TestCase):
 
 
 class GoogleSheetsFacadeTest(unittest.TestCase):
+
     @mock.patch('load_template_google_sheets.service_account.ServiceAccountCredentials'
                 '.get_application_default', lambda: None)
     @mock.patch('load_template_google_sheets.discovery.build')
@@ -303,6 +307,7 @@ class GoogleSheetsFacadeTest(unittest.TestCase):
 
 
 class StringFormatterTest(unittest.TestCase):
+
     def test_format_elements_snakecase_list(self):
         test_list = ['AA-AA', 'BB-BB']
         load_template_google_sheets.StringFormatter.format_elements_to_snakecase(test_list)

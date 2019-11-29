@@ -38,6 +38,7 @@ Template maker
 
 
 class TemplateMaker:
+
     def __init__(self):
         self.__datacatalog_facade = DataCatalogFacade()
 
@@ -119,6 +120,7 @@ Input reader
 
 
 class CSVFilesReader:
+
     @classmethod
     def read_master(cls, folder, file_id, values_per_line=3):
         return cls.__read(folder, file_id, 'master', values_per_line)
@@ -173,6 +175,7 @@ class DataCatalogFacade:
     """
     Manage Templates by communicating to Data Catalog's API.
     """
+
     def __init__(self):
         # Initialize the API client.
         self.__datacatalog = datacatalog.DataCatalogClient()
@@ -236,6 +239,7 @@ Tools & utilities
 
 
 class StringFormatter:
+
     @classmethod
     def format_elements_to_snakecase(cls, a_list, internal_index=None):
         if internal_index is None:

@@ -9,6 +9,7 @@ import load_template_csv
 
 @mock.patch('load_template_csv.CSVFilesReader')
 class TemplateMakerTest(unittest.TestCase):
+
     @mock.patch('load_template_csv.DataCatalogFacade')
     def setUp(self, mock_datacatalog_facade):
         self.__template_maker = load_template_csv.TemplateMaker()
@@ -112,6 +113,7 @@ class TemplateMakerTest(unittest.TestCase):
 
 @mock.patch('load_template_csv.open', new_callable=mock.mock_open())
 class CSVFilesReaderTest(unittest.TestCase):
+
     def test_read_master_should_return_content_as_list(self, mock_open):
         mock_open.return_value = io.StringIO(
             'col1,col2,col3\n'
@@ -158,6 +160,7 @@ class CSVFilesReaderTest(unittest.TestCase):
 
 
 class DataCatalogFacadeTest(unittest.TestCase):
+
     @mock.patch('load_template_csv.datacatalog.DataCatalogClient')
     def setUp(self, mock_datacatalog_client):
         self.__datacatalog_facade = load_template_csv.DataCatalogFacade()
@@ -215,6 +218,7 @@ class DataCatalogFacadeTest(unittest.TestCase):
 
 
 class StringFormatterTest(unittest.TestCase):
+
     def test_format_elements_snakecase_list(self):
         test_list = ['AA-AA', 'BB-BB']
         load_template_csv.StringFormatter.format_elements_to_snakecase(test_list)

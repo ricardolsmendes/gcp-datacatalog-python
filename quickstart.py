@@ -20,6 +20,7 @@ from google.cloud.datacatalog import enums, types
 
 
 class DataCatalogFacade:
+
     def __init__(self):
         # Initialize the API client.
         self.__datacatalog = datacatalog.DataCatalogClient()

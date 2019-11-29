@@ -39,6 +39,7 @@ Template maker
 
 
 class TemplateMaker:
+
     def __init__(self):
         self.__sheets_reader = GoogleSheetsReader()
         self.__datacatalog_facade = DataCatalogFacade()
@@ -124,6 +125,7 @@ Input reader
 
 
 class GoogleSheetsReader:
+
     def __init__(self):
         self.__sheets_facade = GoogleSheetsFacade()
 
@@ -171,6 +173,7 @@ class DataCatalogFacade:
     """
     Manage Templates by communicating to Data Catalog's API.
     """
+
     def __init__(self):
         # Initialize the API client.
         self.__datacatalog = datacatalog.DataCatalogClient()
@@ -231,6 +234,7 @@ class GoogleSheetsFacade:
     """
     Access spreadsheets data by communicating to the Google Sheets API.
     """
+
     def __init__(self):
         # Initialize the API client.
         self.__service = discovery.build(
@@ -252,6 +256,7 @@ Tools & utilities
 
 
 class StringFormatter:
+
     @classmethod
     def format_elements_to_snakecase(cls, a_list, internal_index=None):
         if internal_index is None:
