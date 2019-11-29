@@ -54,7 +54,7 @@ def bigquery_table(bigquery_dataset):
 def datacatalog_table_entry(bigquery_table):
     entry = datacatalog_client.lookup_entry(
         linked_resource=f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
-                        f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
+        f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
 
     yield entry
 
@@ -85,9 +85,9 @@ def datacatalog_tag_template():
 
     # Delete a Tag Template with the same name if it already exists.
     try:
-        datacatalog_client.delete_tag_template(
-            name=f'{location}/tagTemplates/'
-                 f'{__generate_uuid()}_quickstart_test_tag_template', force=True)
+        name = datacatalog.DataCatalogClient.tag_template_path(
+            TEST_PROJECT_ID, 'us-central1', f'{__generate_uuid()}_quickstart_test_tag_template')
+        datacatalog_client.delete_tag_template(name=name, force=True)
     except exceptions.PermissionDenied:
         pass
 

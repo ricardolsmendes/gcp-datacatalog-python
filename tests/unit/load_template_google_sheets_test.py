@@ -9,7 +9,6 @@ import load_template_google_sheets
 
 
 class TemplateMakerTest(unittest.TestCase):
-
     @mock.patch('load_template_google_sheets.DataCatalogFacade')
     @mock.patch('load_template_google_sheets.GoogleSheetsReader')
     def setUp(self, mock_sheets_reader, mock_datacatalog_facade):
@@ -30,9 +29,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         sheets_reader.read_master.assert_called_once()
         datacatalog_facade.tag_template_exists.assert_called_once()
@@ -46,9 +46,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         sheets_reader.read_helper.assert_called_once()
 
@@ -60,9 +61,11 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template', delete_existing=True)
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template',
+                                  delete_existing=True)
 
         sheets_reader.read_helper.assert_called_once()
         # Both master and helper Templates are created.
@@ -78,9 +81,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         sheets_reader.read_helper.assert_called_once()
         # Only the master Template is created.
@@ -97,9 +101,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade.tag_template_exists.return_value = False
 
         with self.assertRaises(errors.HttpError):
-            self.__template_maker.run(
-                spreadsheet_id=None, project_id=None, template_id='test-template-id',
-                display_name='Test Template')
+            self.__template_maker.run(spreadsheet_id=None,
+                                      project_id=None,
+                                      template_id='test-template-id',
+                                      display_name='Test Template')
 
         sheets_reader.read_helper.assert_called_once()
         # Only the master Template is created.
@@ -112,9 +117,10 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template')
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template')
 
         datacatalog_facade.delete_tag_template.assert_not_called()
 
@@ -125,15 +131,16 @@ class TemplateMakerTest(unittest.TestCase):
         datacatalog_facade = self.__datacatalog_facade
         datacatalog_facade.tag_template_exists.return_value = False
 
-        self.__template_maker.run(
-            spreadsheet_id=None, project_id=None, template_id='test-template-id',
-            display_name='Test Template', delete_existing=True)
+        self.__template_maker.run(spreadsheet_id=None,
+                                  project_id=None,
+                                  template_id='test-template-id',
+                                  display_name='Test Template',
+                                  delete_existing=True)
 
         datacatalog_facade.delete_tag_template.assert_called_once()
 
 
 class GoogleSheetsReaderTest(unittest.TestCase):
-
     @mock.patch('load_template_google_sheets.GoogleSheetsFacade')
     def setUp(self, mock_sheets_facade):
         self.__sheets_reader = load_template_google_sheets.GoogleSheetsReader()
@@ -207,7 +214,6 @@ class GoogleSheetsReaderTest(unittest.TestCase):
 
 
 class DataCatalogFacadeTest(unittest.TestCase):
-
     @mock.patch('load_template_google_sheets.datacatalog.DataCatalogClient')
     def setUp(self, mock_datacatalog_client):
         self.__datacatalog_facade = load_template_google_sheets.DataCatalogFacade()
@@ -266,10 +272,8 @@ class DataCatalogFacadeTest(unittest.TestCase):
 
 
 class GoogleSheetsFacadeTest(unittest.TestCase):
-
-    @mock.patch(
-        'load_template_google_sheets.service_account.ServiceAccountCredentials'
-        '.get_application_default', lambda: None)
+    @mock.patch('load_template_google_sheets.service_account.ServiceAccountCredentials'
+                '.get_application_default', lambda: None)
     @mock.patch('load_template_google_sheets.discovery.build')
     def setUp(self, mock_build):
         self.__sheets_facade = load_template_google_sheets.GoogleSheetsFacade()
@@ -286,8 +290,9 @@ class GoogleSheetsFacadeTest(unittest.TestCase):
             .batchGet.return_value\
             .execute.return_value = {}
 
-        sheet_data = self.__sheets_facade.read_sheet(
-            spreadsheet_id='test-id', sheet_name='test-name', values_per_line=2)
+        sheet_data = self.__sheets_facade.read_sheet(spreadsheet_id='test-id',
+                                                     sheet_name='test-name',
+                                                     values_per_line=2)
 
         self.assertEqual({}, sheet_data)
 
@@ -298,7 +303,6 @@ class GoogleSheetsFacadeTest(unittest.TestCase):
 
 
 class StringFormatterTest(unittest.TestCase):
-
     def test_format_elements_snakecase_list(self):
         test_list = ['AA-AA', 'BB-BB']
         load_template_google_sheets.StringFormatter.format_elements_to_snakecase(test_list)
@@ -306,13 +310,13 @@ class StringFormatterTest(unittest.TestCase):
 
     def test_format_elements_snakecase_internal_index(self):
         test_list = [['AA-AA', 'Test A'], ['BB-BB', 'Test B']]
-        load_template_google_sheets.StringFormatter.format_elements_to_snakecase(
-            test_list, internal_index=0)
+        load_template_google_sheets.StringFormatter.format_elements_to_snakecase(test_list,
+                                                                                 internal_index=0)
         self.assertListEqual([['aa_aa', 'Test A'], ['bb_bb', 'Test B']], test_list)
 
     def test_format_string_to_snakecase_abbreviation(self):
-        self.assertEqual(
-            'aaa', load_template_google_sheets.StringFormatter.format_to_snakecase('AAA'))
+        self.assertEqual('aaa',
+                         load_template_google_sheets.StringFormatter.format_to_snakecase('AAA'))
         self.assertEqual(
             'aaa_aaa', load_template_google_sheets.StringFormatter.format_to_snakecase('AAA-AAA'))
 
@@ -344,11 +348,11 @@ class StringFormatterTest(unittest.TestCase):
 
     def test_format_string_to_snakecase_special_chars(self):
         self.assertEqual(
-            'special_chars', load_template_google_sheets.StringFormatter.format_to_snakecase(
-                'special!#@-_ chars'))
+            'special_chars',
+            load_template_google_sheets.StringFormatter.format_to_snakecase('special!#@-_ chars'))
         self.assertEqual(
-            'special_chars', load_template_google_sheets.StringFormatter.format_to_snakecase(
-                '! special chars ?'))
+            'special_chars',
+            load_template_google_sheets.StringFormatter.format_to_snakecase('! special chars ?'))
 
     def test_format_string_to_snakecase_unicode(self):
         self.assertEqual(
