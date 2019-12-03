@@ -1,9 +1,11 @@
-FROM python:3.7
-WORKDIR /app
+FROM python:3.6
 
-# Copy the credentials file and use it to set the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-COPY ./credentials/*.json ./credentials/
-ENV GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
+# Set the GOOGLE_APPLICATION_CREDENTIALS environment variable.
+# At run time, /credentials must be binded to a volume containing a valid
+# Service Account credentials file named datacatalog-samples.json.
+ENV GOOGLE_APPLICATION_CREDENTIALS=/credentials/datacatalog-samples.json
+
+WORKDIR /app
 
 # Copy the requirements.txt file and install all dependencies.
 COPY requirements.txt .

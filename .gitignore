@@ -107,5 +107,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# Application logs
+log/
+
 # GCP access files
 credentials/

@@ -2,9 +2,15 @@
 .git
 .gitignore
 
+# Docker
+.dockerignore
+Dockerfile
+
+# CI/CD
+.circleci/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
-**/__pycache__
 *.py[cod]
 *$py.class
 
@@ -112,6 +118,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Docker
-.dockerignore
-Dockerfile
+# Application logs
+log/
+
+# GCP access files
+credentials/
