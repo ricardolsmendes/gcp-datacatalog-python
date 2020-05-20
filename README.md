@@ -5,14 +5,37 @@ Self-contained ready-to-use Python scripts to help Data Citizens who work with
 
 [![CircleCI][2]][3]
 
-- [Quickstart](#3-quickstart): sample code for Data Catalog's API core features.
+## Table of Contents
 
-- [Load Tag Templates from CSV files](#4-load-tag-templates-from-csv-files): loads a set of fields
-from **CSV files** and creates Tag Templates using them.
+<!-- toc -->
 
-- [Load Tag Templates from Google Sheets](#5-load-tag-templates-from-google-sheets): loads a set of
-fields from **Google Sheets** and creates Tag Templates using them.
+- [1. Understand the concepts behind this code](#1-understand-the-concepts-behind-this-code)
+- [2. Environment setup](#2-environment-setup)
+  * [2.1. Get the code](#21-get-the-code)
+  * [2.2. Auth credentials](#22-auth-credentials)
+      - [2.2.1. Create a service account and grant it below roles](#221-create-a-service-account-and-grant-it-below-roles)
+      - [2.2.2. Download a JSON key and save it as](#222-download-a-json-key-and-save-it-as)
+  * [2.3. Virtualenv](#23-virtualenv)
+      - [2.3.1. Install Python 3.6+](#231-install-python-36)
+      - [2.3.2. Create and activate an isolated Python environment](#232-create-and-activate-an-isolated-python-environment)
+      - [2.3.3. Install the dependencies](#233-install-the-dependencies)
+      - [2.3.4. Set environment variables](#234-set-environment-variables)
+  * [2.4. Docker](#24-docker)
+  * [2.5. Integration tests](#25-integration-tests)
+- [3. Quickstart](#3-quickstart)
+  * [3.1. Integration tests](#31-integration-tests)
+  * [3.2. quickstart.py](#32-quickstartpy)
+- [4. Load Tag Templates from CSV files](#4-load-tag-templates-from-csv-files)
+  * [4.1. Provide CSV files representing the Template to be created](#41-provide-csv-files-representing-the-template-to-be-created)
+  * [4.2. Integration tests](#42-integration-tests)
+  * [4.3. load_template_csv.py](#43-load_template_csvpy)
+- [5. Load Tag Templates from Google Sheets](#5-load-tag-templates-from-google-sheets)
+  * [5.1. Enable the Google Sheets API in your GCP Project](#51-enable-the-google-sheets-api-in-your-gcp-project)
+  * [5.2. Provide Google Spreadsheets representing the Template to be created](#52-provide-google-spreadsheets-representing-the-template-to-be-created)
+  * [5.3. Integration tests](#53-integration-tests)
+  * [5.4. load_template_google_sheets.py](#54-load_template_google_sheetspy)
 
+<!-- tocstop -->
 
 ## 1. Understand the concepts behind this code
 
