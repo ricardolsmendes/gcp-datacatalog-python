@@ -12,8 +12,8 @@ Self-contained ready-to-use Python scripts to help Data Citizens who work with
 - [1. Understand the concepts behind this code](#1-understand-the-concepts-behind-this-code)
 - [2. Environment setup](#2-environment-setup)
   * [2.1. Get the code](#21-get-the-code)
-  * [2.2. Set up the Auth Credentials](#22-set-up-the-auth-credentials)
-  * [2.3. Set up Virtualenv](#23-set-up-virtualenv)
+  * [2.2. Auth credentials](#22-auth-credentials)
+  * [2.3. Virtualenv](#23-virtualenv)
   * [2.4. Docker](#24-docker)
   * [2.5. Integration tests](#25-integration-tests)
 - [3. Quickstart](#3-quickstart)
@@ -49,7 +49,7 @@ git clone https://github.com/ricardolsmendes/gcp-datacatalog-python.git
 cd gcp-datacatalog-python
 ````
 
-### 2.2. Set up the Auth Credentials
+### 2.2. Auth credentials
 
 **2.2.1. Create a service account and grant it below roles**
 
@@ -59,7 +59,7 @@ cd gcp-datacatalog-python
 **2.2.2. Download a JSON key and save it as**
 - `./credentials/datacatalog-samples.json`
 
-### 2.3. Set up Virtualenv
+### 2.3. Virtualenv
 
 Using *virtualenv* is optional, but strongly recommended unless you use [Docker](#24-docker).
 
@@ -88,7 +88,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
 ### 2.4. Docker
 
 Docker may be used to run all the scripts. In this case please disregard the
-[Set up Virtualenv](#23-set-up-virtualenv) install instructions. 
+[Set up Virtualenv](#23-virtualenv) install instructions. 
 
 ### 2.5. Integration tests
 

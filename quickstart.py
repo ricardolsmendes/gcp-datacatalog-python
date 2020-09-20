@@ -16,7 +16,8 @@ import argparse
 
 from google.api_core import exceptions
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog import FieldType, LookupEntryRequest,  SearchCatalogRequest, Tag,\
+    TagTemplate, TagTemplateField
 
 
 class DataCatalogFacade:
@@ -28,7 +29,7 @@ class DataCatalogFacade:
     def search_catalog(self, organization_id, query):
         """Search Data Catalog for a given organization."""
 
-        scope = types.SearchCatalogRequest.Scope()
+        scope = SearchCatalogRequest.Scope()
         scope.include_org_ids.append(organization_id)
 
         return self.__fetch_search_results(
@@ -46,15 +47,18 @@ class DataCatalogFacade:
     def lookup_entry(self, linked_resource):
         """Lookup the Data Catalog Entry for a given resource."""
 
-        return self.__datacatalog.lookup_entry(linked_resource=linked_resource)
+        request = LookupEntryRequest()
+        request.linked_resource = linked_resource
+
+        return self.__datacatalog.lookup_entry(request=request)
 
     def create_tag_template(self, project_id, template_id, display_name,
                             primitive_fields_descriptors):
         """Create a Tag Template."""
 
-        location = self.__datacatalog.location_path(project_id, 'us-central1')
+        location = f'projects/{project_id}/locations/us-central1'
 
-        tag_template = types.TagTemplate()
+        tag_template = TagTemplate()
         tag_template.display_name = display_name
 
         for descriptor in primitive_fields_descriptors:
@@ -69,7 +73,7 @@ class DataCatalogFacade:
     def create_tag_template_field(self, template_name, field_id, display_name, enum_values):
         """Add field to a Tag Template."""
 
-        field = types.TagTemplateField()
+        field = TagTemplateField()
         field.display_name = display_name
 
         for enum_value in enum_values:
@@ -97,7 +101,7 @@ class DataCatalogFacade:
     def create_tag(self, entry, tag_template, fields_descriptors):
         """Create a Tag."""
 
-        tag = types.Tag()
+        tag = Tag()
         tag.template = tag_template.name
 
         for descriptor in fields_descriptors:
@@ -109,10 +113,10 @@ class DataCatalogFacade:
     @classmethod
     def __set_tag_field_value(cls, field, value, primitive_type=None):
         set_primitive_field_value_functions = {
-            enums.FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
-            enums.FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
-            enums.FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
-            enums.FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
+            FieldType.PrimitiveType.BOOL: cls.__set_bool_field_value,
+            FieldType.PrimitiveType.DOUBLE: cls.__set_double_field_value,
+            FieldType.PrimitiveType.STRING: cls.__set_string_field_value,
+            FieldType.PrimitiveType.TIMESTAMP: cls.__set_timestamp_field_value
         }
 
         if primitive_type:
@@ -202,7 +206,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
 
     primitive_fields_descriptors = [{
         'id': 'has_pii',
-        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'primitive_type': FieldType.PrimitiveType.BOOL,
         'display_name': 'Has PII'
     }]
 
@@ -232,7 +236,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     fields_descriptors = [{
         'id': 'has_pii',
-        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'primitive_type': FieldType.PrimitiveType.BOOL,
         'value': False
     }]
 
@@ -247,7 +251,7 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
     # ================================================================================
     fields_descriptors = [{
         'id': 'has_pii',
-        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'primitive_type': FieldType.PrimitiveType.BOOL,
         'value': True
     }, {
         'id': 'pii_type',
