@@ -6,8 +6,7 @@ import argparse
 import logging
 import sys
 
-from google.cloud import datacatalog_v1beta1
-from google.cloud.datacatalog import Taxonomy
+from google.cloud import datacatalog
 
 
 """
@@ -47,14 +46,14 @@ class DataCatalogFacade:
 
     def __init__(self):
         # Initialize the API client.
-        self.__datacatalog = datacatalog_v1beta1.PolicyTagManagerClient()
+        self.__datacatalog = datacatalog.PolicyTagManagerClient()
 
     def create_taxonomy(self, project_id, display_name, description=None):
         """Create a Taxonomy."""
 
         location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_LOCATION}'
 
-        taxonomy = Taxonomy()
+        taxonomy = datacatalog.Taxonomy()
         taxonomy.display_name = display_name
         taxonomy.description = description
 
