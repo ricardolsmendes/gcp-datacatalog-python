@@ -116,7 +116,7 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=<YOUR-ORGANIZATION-ID> \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/quickstart_test.py
 ```
 
@@ -133,7 +133,7 @@ python quickstart.py --organization-id <YOUR-ORGANIZATION-ID> --project-id <YOUR
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   python quickstart.py --organization-id <YOUR-ORGANIZATION-ID> --project-id <YOUR-PROJECT-ID>
 ```
 
@@ -178,7 +178,7 @@ pytest ./tests/integration/load_template_csv_test.py
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/load_template_csv_test.py
 ```
 
@@ -198,7 +198,7 @@ python load_template_csv.py \
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   python load_template_csv.py \
   --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
   --project-id <YOUR-PROJECT-ID> --files-folder <FILES-FOLDER> \
@@ -251,7 +251,7 @@ pytest ./tests/integration/load_template_google_sheets_test.py
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
   --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/load_template_google_sheets_test.py
 ```
 
@@ -271,7 +271,7 @@ python load_template_google_sheets.py \
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
-  --volume CREDENTIALS_FILE_FOLDER:/credentials \
+  --volume <CREDENTIALS-FILE-FOLDER>:/credentials \
   python load_template_google_sheets.py \
   --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
   --project-id <YOUR-PROJECT-ID> --spreadsheet-id <SPREADSHEET-ID> \
