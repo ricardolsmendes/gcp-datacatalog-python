@@ -10,7 +10,7 @@ import unicodedata
 
 from google.api_core import exceptions
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog import FieldType, TagTemplate, TagTemplateField
 from googleapiclient import discovery
 from googleapiclient import errors
 from oauth2client import service_account
@@ -186,24 +186,26 @@ class DataCatalogFacade:
                             enums_names=None):
         """Create a Tag Template."""
 
-        location = datacatalog.DataCatalogClient.location_path(project_id, _CLOUD_PLATFORM_REGION)
+        location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_REGION}'
 
-        tag_template = types.TagTemplate()
+        tag_template = TagTemplate()
         tag_template.display_name = display_name
 
         for descriptor in fields_descriptors:
+            field = TagTemplateField()
+            field.display_name = descriptor[1]
+
             field_id = descriptor[0]
             field_type = descriptor[2]
-
-            tag_template.fields[field_id].display_name = descriptor[1]
-
             if not field_type == _DATA_CATALOG_ENUM_TYPE:
-                tag_template.fields[field_id].type.primitive_type = \
-                    enums.FieldType.PrimitiveType[field_type]
+                field.type.primitive_type = FieldType.PrimitiveType[field_type]
             else:
                 for enum_name in enums_names[field_id]:
-                    fields = tag_template.fields
-                    fields[field_id].type.enum_type.allowed_values.add().display_name = enum_name
+                    value = FieldType.EnumType.EnumValue()
+                    value.display_name = enum_name
+                    field.type.enum_type.allowed_values.append(value)
+
+            tag_template.fields[field_id] = field
 
         created_tag_template = self.__datacatalog.create_tag_template(parent=location,
                                                                       tag_template_id=template_id,

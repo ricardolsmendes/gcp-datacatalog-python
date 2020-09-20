@@ -3,7 +3,7 @@ import re
 
 from google.api_core import exceptions
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums
+from google.cloud.datacatalog import FieldType
 
 import quickstart
 
@@ -117,19 +117,19 @@ def test_datacatalog_facade_lookup_entry_fail_permission_denied(bigquery_table):
 def test_datacatalog_facade_create_tag_template():
     primitive_fields_descriptors = [{
         'id': 'boolean_field',
-        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'primitive_type': FieldType.PrimitiveType.BOOL,
         'display_name': 'Testing boolean fields'
     }, {
         'id': 'double_field',
-        'primitive_type': enums.FieldType.PrimitiveType.DOUBLE,
+        'primitive_type': FieldType.PrimitiveType.DOUBLE,
         'display_name': 'Testing double fields'
     }, {
         'id': 'string_field',
-        'primitive_type': enums.FieldType.PrimitiveType.STRING,
+        'primitive_type': FieldType.PrimitiveType.STRING,
         'display_name': 'Testing string fields'
     }, {
         'id': 'datetime_field',
-        'primitive_type': enums.FieldType.PrimitiveType.TIMESTAMP,
+        'primitive_type': FieldType.PrimitiveType.TIMESTAMP,
         'display_name': 'Testing timestamp fields'
     }]
 
@@ -171,19 +171,19 @@ def test_datacatalog_facade_create_tag(bigquery_table, datacatalog_tag_template)
 
     fields_descriptors = [{
         'id': 'boolean_field',
-        'primitive_type': enums.FieldType.PrimitiveType.BOOL,
+        'primitive_type': FieldType.PrimitiveType.BOOL,
         'value': True
     }, {
         'id': 'double_field',
-        'primitive_type': enums.FieldType.PrimitiveType.DOUBLE,
+        'primitive_type': FieldType.PrimitiveType.DOUBLE,
         'value': 10.5
     }, {
         'id': 'string_field',
-        'primitive_type': enums.FieldType.PrimitiveType.STRING,
+        'primitive_type': FieldType.PrimitiveType.STRING,
         'value': 'test'
     }, {
         'id': 'timestamp_field',
-        'primitive_type': enums.FieldType.PrimitiveType.TIMESTAMP,
+        'primitive_type': FieldType.PrimitiveType.TIMESTAMP,
         'value': '2019-07-04T01:00:30Z'
     }, {
         'id': 'enum_field',

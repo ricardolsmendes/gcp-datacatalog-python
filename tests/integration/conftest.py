@@ -7,7 +7,7 @@ import pytest
 from google.api_core import exceptions
 from google.cloud import bigquery
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums, types
+from google.cloud.datacatalog import FieldType, LookupEntryRequest, Tag, TagTemplate
 
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
@@ -52,16 +52,18 @@ def bigquery_table(bigquery_dataset):
 
 @pytest.fixture
 def datacatalog_table_entry(bigquery_table):
-    entry = datacatalog_client.lookup_entry(
-        linked_resource=f'//bigquery.googleapis.com/projects/{bigquery_table.project}'
-        f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}')
+    request = LookupEntryRequest()
+    request.linked_resource = \
+        f'//bigquery.googleapis.com/projects/{bigquery_table.project}' \
+        f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}'
 
+    entry = datacatalog_client.lookup_entry(request=request)
     yield entry
 
 
 @pytest.fixture
 def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
-    tag = types.Tag()
+    tag = Tag()
     tag.template = datacatalog_tag_template.name
 
     tag.fields['boolean_field'].bool_value = True
@@ -81,7 +83,7 @@ def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
 
 @pytest.fixture
 def datacatalog_tag_template():
-    location = datacatalog.DataCatalogClient.location_path(TEST_PROJECT_ID, 'us-central1')
+    location = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
 
     # Delete a Tag Template with the same name if it already exists.
     try:
@@ -91,12 +93,12 @@ def datacatalog_tag_template():
     except exceptions.PermissionDenied:
         pass
 
-    template = types.TagTemplate()
-    template.fields['boolean_field'].type.primitive_type = enums.FieldType.PrimitiveType.BOOL
-    template.fields['double_field'].type.primitive_type = enums.FieldType.PrimitiveType.DOUBLE
-    template.fields['string_field'].type.primitive_type = enums.FieldType.PrimitiveType.STRING
+    template = TagTemplate()
+    template.fields['boolean_field'].type.primitive_type = FieldType.PrimitiveType.BOOL
+    template.fields['double_field'].type.primitive_type = FieldType.PrimitiveType.DOUBLE
+    template.fields['string_field'].type.primitive_type = FieldType.PrimitiveType.STRING
     template.fields['timestamp_field'].type.primitive_type = \
-        enums.FieldType.PrimitiveType.TIMESTAMP
+        FieldType.PrimitiveType.TIMESTAMP
 
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 1'
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 2'
