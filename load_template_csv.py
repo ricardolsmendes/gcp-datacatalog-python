@@ -11,7 +11,6 @@ import unicodedata
 
 from google.api_core import exceptions
 from google.cloud import datacatalog
-from google.cloud.datacatalog import FieldType, TagTemplate, TagTemplateField
 
 
 """
@@ -190,22 +189,22 @@ class DataCatalogFacade:
 
         location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_REGION}'
 
-        tag_template = TagTemplate()
+        tag_template = datacatalog.TagTemplate()
         tag_template.display_name = display_name
 
         for descriptor in fields_descriptors:
-            field = TagTemplateField()
+            field = datacatalog.TagTemplateField()
             field.display_name = descriptor[1]
 
             field_id = descriptor[0]
             field_type = descriptor[2]
             if not field_type == _DATA_CATALOG_ENUM_TYPE:
-                field.type.primitive_type = FieldType.PrimitiveType[field_type]
+                field.type.primitive_type = datacatalog.FieldType.PrimitiveType[field_type]
             else:
                 for enum_name in enums_names[field_id]:
-                    value = FieldType.EnumType.EnumValue()
-                    value.display_name = enum_name
-                    field.type.enum_type.allowed_values.append(value)
+                    enum_value = datacatalog.FieldType.EnumType.EnumValue()
+                    enum_value.display_name = enum_name
+                    field.type.enum_type.allowed_values.append(enum_value)
 
             tag_template.fields[field_id] = field
 

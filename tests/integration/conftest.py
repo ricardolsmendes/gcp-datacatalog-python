@@ -5,9 +5,7 @@ import uuid
 import pytest
 
 from google.api_core import exceptions
-from google.cloud import bigquery
-from google.cloud import datacatalog
-from google.cloud.datacatalog import FieldType, LookupEntryRequest, Tag, TagTemplate
+from google.cloud import bigquery, datacatalog
 
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
@@ -52,7 +50,7 @@ def bigquery_table(bigquery_dataset):
 
 @pytest.fixture
 def datacatalog_table_entry(bigquery_table):
-    request = LookupEntryRequest()
+    request = datacatalog.LookupEntryRequest()
     request.linked_resource = \
         f'//bigquery.googleapis.com/projects/{bigquery_table.project}' \
         f'/datasets/{bigquery_table.dataset_id}/tables/{bigquery_table.table_id}'
@@ -63,7 +61,7 @@ def datacatalog_table_entry(bigquery_table):
 
 @pytest.fixture
 def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
-    tag = Tag()
+    tag = datacatalog.Tag()
     tag.template = datacatalog_tag_template.name
 
     tag.fields['boolean_field'].bool_value = True
@@ -93,12 +91,14 @@ def datacatalog_tag_template():
     except exceptions.PermissionDenied:
         pass
 
-    template = TagTemplate()
-    template.fields['boolean_field'].type.primitive_type = FieldType.PrimitiveType.BOOL
-    template.fields['double_field'].type.primitive_type = FieldType.PrimitiveType.DOUBLE
-    template.fields['string_field'].type.primitive_type = FieldType.PrimitiveType.STRING
+    template = datacatalog.TagTemplate()
+    template.fields['boolean_field'].type.primitive_type = datacatalog.FieldType.PrimitiveType.BOOL
+    template.fields['double_field'].type.primitive_type = \
+        datacatalog.FieldType.PrimitiveType.DOUBLE
+    template.fields['string_field'].type.primitive_type = \
+        datacatalog.FieldType.PrimitiveType.STRING
     template.fields['timestamp_field'].type.primitive_type = \
-        FieldType.PrimitiveType.TIMESTAMP
+        datacatalog.FieldType.PrimitiveType.TIMESTAMP
 
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 1'
     template.fields['enum_field'].type.enum_type.allowed_values.add().display_name = 'VALUE 2'
