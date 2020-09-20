@@ -12,28 +12,22 @@ Self-contained ready-to-use Python scripts to help Data Citizens who work with
 - [1. Understand the concepts behind this code](#1-understand-the-concepts-behind-this-code)
 - [2. Environment setup](#2-environment-setup)
   * [2.1. Get the code](#21-get-the-code)
-  * [2.2. Auth credentials](#22-auth-credentials)
-      - [2.2.1. Create a service account and grant it below roles](#221-create-a-service-account-and-grant-it-below-roles)
-      - [2.2.2. Download a JSON key and save it as](#222-download-a-json-key-and-save-it-as)
-  * [2.3. Virtualenv](#23-virtualenv)
-      - [2.3.1. Install Python 3.6+](#231-install-python-36)
-      - [2.3.2. Create and activate an isolated Python environment](#232-create-and-activate-an-isolated-python-environment)
-      - [2.3.3. Install the dependencies](#233-install-the-dependencies)
-      - [2.3.4. Set environment variables](#234-set-environment-variables)
+  * [2.2. Set up the Auth Credentials](#22-set-up-the-auth-credentials)
+  * [2.3. Set up Virtualenv](#23-set-up-virtualenv)
   * [2.4. Docker](#24-docker)
   * [2.5. Integration tests](#25-integration-tests)
 - [3. Quickstart](#3-quickstart)
   * [3.1. Integration tests](#31-integration-tests)
-  * [3.2. quickstart.py](#32-quickstartpy)
+  * [3.2. Run quickstart.py](#32-run-quickstartpy)
 - [4. Load Tag Templates from CSV files](#4-load-tag-templates-from-csv-files)
   * [4.1. Provide CSV files representing the Template to be created](#41-provide-csv-files-representing-the-template-to-be-created)
   * [4.2. Integration tests](#42-integration-tests)
-  * [4.3. load_template_csv.py](#43-load_template_csvpy)
+  * [4.3. Run load_template_csv.py](#43-run-load_template_csvpy)
 - [5. Load Tag Templates from Google Sheets](#5-load-tag-templates-from-google-sheets)
   * [5.1. Enable the Google Sheets API in your GCP Project](#51-enable-the-google-sheets-api-in-your-gcp-project)
   * [5.2. Provide Google Spreadsheets representing the Template to be created](#52-provide-google-spreadsheets-representing-the-template-to-be-created)
   * [5.3. Integration tests](#53-integration-tests)
-  * [5.4. load_template_google_sheets.py](#54-load_template_google_sheetspy)
+  * [5.4. Run load_template_google_sheets.py](#54-run-load_template_google_sheetspy)
 
 <!-- tocstop -->
 
@@ -55,23 +49,23 @@ git clone https://github.com/ricardolsmendes/gcp-datacatalog-python.git
 cd gcp-datacatalog-python
 ````
 
-### 2.2. Auth credentials
+### 2.2. Set up the Auth Credentials
 
-##### 2.2.1. Create a service account and grant it below roles
+**2.2.1. Create a service account and grant it below roles**
 
 - BigQuery Admin
 - Data Catalog Admin
 
-##### 2.2.2. Download a JSON key and save it as
+**2.2.2. Download a JSON key and save it as**
 - `./credentials/datacatalog-samples.json`
 
-### 2.3. Virtualenv
+### 2.3. Set up Virtualenv
 
 Using *virtualenv* is optional, but strongly recommended unless you use [Docker](#24-docker).
 
-##### 2.3.1. Install Python 3.6+
+**2.3.1. Install Python 3.6+**
 
-##### 2.3.2. Create and activate an isolated Python environment
+**2.3.2. Create and activate an isolated Python environment**
 
 ```bash
 pip install --upgrade virtualenv
@@ -79,13 +73,13 @@ python3 -m virtualenv --python python3 env
 source ./env/bin/activate
 ```
 
-##### 2.3.3. Install the dependencies
+**2.3.3. Install the dependencies**
 
 ```bash
 pip install --upgrade -r requirements.txt
 ```
 
-##### 2.3.4. Set environment variables
+**2.3.4. Set environment variables**
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
@@ -93,8 +87,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=./credentials/datacatalog-samples.json
 
 ### 2.4. Docker
 
-Docker may be used as an alternative to run all the scripts. In this case please disregard the
-[Virtualenv](#23-virtualenv) install instructions. 
+Docker may be used to run all the scripts. In this case please disregard the
+[Set up Virtualenv](#23-set-up-virtualenv) install instructions. 
 
 ### 2.5. Integration tests
 
@@ -109,8 +103,8 @@ temporary resources that are deleted just after being used.
 - pytest
 
 ```bash
-export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID
-export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
+export GOOGLE_CLOUD_TEST_ORGANIZATION_ID=<YOUR-ORGANIZATION-ID>
+export GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID>
 
 pytest ./tests/integration/quickstart_test.py
 ```
@@ -120,18 +114,18 @@ pytest ./tests/integration/quickstart_test.py
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
-  --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=ORGANIZATION_ID \
-  --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
+  --env GOOGLE_CLOUD_TEST_ORGANIZATION_ID=<YOUR-ORGANIZATION-ID> \
+  --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/quickstart_test.py
 ```
 
-### 3.2. quickstart.py
+### 3.2. Run quickstart.py
 
 - python
 
 ```bash
-python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
+python quickstart.py --organization-id <YOUR-ORGANIZATION-ID> --project-id <YOUR-PROJECT-ID>
 ```
 
 - docker
@@ -140,7 +134,7 @@ python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
-  python quickstart.py --organization-id ORGANIZATION_ID --project-id PROJECT_ID
+  python quickstart.py --organization-id <YOUR-ORGANIZATION-ID> --project-id <YOUR-PROJECT-ID>
 ```
 
 ## 4. Load Tag Templates from CSV files
@@ -165,7 +159,7 @@ Name based on it.
 1. All Fields' IDs generated by the script will be formatted to snake case (e.g., foo_bar_baz), but
 it will do the formatting job for you. So, just provide the IDs as strings.
 
-*TIP: keep all template-related files in the same folder (`sample-input/load-template-csv` for
+*TIP: keep all template-related files in the same folder ([sample-input/load-template-csv][7] for
 reference).*
 
 ### 4.2. Integration tests
@@ -173,7 +167,7 @@ reference).*
 - pytest
 
 ```bash
-export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
+export GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID>
 
 pytest ./tests/integration/load_template_csv_test.py
 ```
@@ -183,19 +177,19 @@ pytest ./tests/integration/load_template_csv_test.py
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
-  --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
+  --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/load_template_csv_test.py
 ```
 
-### 4.3. load_template_csv.py
+### 4.3. Run load_template_csv.py
 
 - python
 
 ```bash
 python load_template_csv.py \
-  --template-id TEMPLATE_ID --display-name DISPLAY_NAME \
-  --project-id PROJECT_ID --files-folder FILES_FOLDER \
+  --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
+  --project-id <YOUR-PROJECT-ID> --files-folder <FILES-FOLDER> \
   [--delete-existing]
 ```
 
@@ -206,8 +200,8 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
   python load_template_csv.py \
-  --template-id TEMPLATE_ID --display-name DISPLAY_NAME \
-  --project-id PROJECT_ID --files-folder FILES_FOLDER \
+  --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
+  --project-id <YOUR-PROJECT-ID> --files-folder <FILES-FOLDER> \
   [--delete-existing]
 ```
 
@@ -215,7 +209,7 @@ docker run --rm --tty gcp-datacatalog-python \
 
 ### 5.1. Enable the Google Sheets API in your GCP Project
 
-https://console.developers.google.com/apis/library/sheets.googleapis.com?project=<PROJECT_ID>
+https://console.developers.google.com/apis/library/sheets.googleapis.com?project=<YOUR-PROJECT-ID>
 
 ### 5.2. Provide Google Spreadsheets representing the Template to be created
 
@@ -238,7 +232,7 @@ Display Name based on it.
 1. All Fields' IDs generated by the script will be formatted to snake case (e.g., foo_bar_baz), but
 it will do the formatting job for you. So, just provide the IDs as strings.
 
-*TIP: keep all template-related sheets in the same document ([Data Catalog Sample Tag Template][7]
+*TIP: keep all template-related sheets in the same document ([Data Catalog Sample Tag Template][8]
 for reference).*
 
 ### 5.3. Integration tests
@@ -246,7 +240,7 @@ for reference).*
 - pytest
 
 ```bash
-export GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID
+export GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID>
 
 pytest ./tests/integration/load_template_google_sheets_test.py
 ```
@@ -256,19 +250,19 @@ pytest ./tests/integration/load_template_google_sheets_test.py
 ```bash
 docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty \
-  --env GOOGLE_CLOUD_TEST_PROJECT_ID=PROJECT_ID \
+  --env GOOGLE_CLOUD_TEST_PROJECT_ID=<YOUR-PROJECT-ID> \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
   gcp-datacatalog-python pytest ./tests/integration/load_template_google_sheets_test.py
 ```
 
-### 5.4. load_template_google_sheets.py
+### 5.4. Run load_template_google_sheets.py
 
 - python
 
 ```bash
 python load_template_google_sheets.py \
-  --template-id TEMPLATE_ID --display-name DISPLAY_NAME \
-  --project-id PROJECT_ID --spreadsheet-id SPREADSHEET_ID \
+  --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
+  --project-id <YOUR-PROJECT-ID> --spreadsheet-id <SPREADSHEET-ID> \
   [--delete-existing]
 ```
 
@@ -279,8 +273,8 @@ docker build --rm --tag gcp-datacatalog-python .
 docker run --rm --tty gcp-datacatalog-python \
   --volume CREDENTIALS_FILE_FOLDER:/credentials \
   python load_template_google_sheets.py \
-  --template-id TEMPLATE_ID --display-name DISPLAY_NAME \
-  --project-id PROJECT_ID --spreadsheet-id SPREADSHEET_ID \
+  --template-id <TEMPLATE-ID> --display-name <DISPLAY-NAME> \
+  --project-id <YOUR-PROJECT-ID> --spreadsheet-id <SPREADSHEET-ID> \
   [--delete-existing]
 ```
 
@@ -290,4 +284,5 @@ docker run --rm --tty gcp-datacatalog-python \
 [4]: https://medium.com/google-cloud/data-catalog-hands-on-guide-a-mental-model-dae7f6dd49e
 [5]: https://medium.com/google-cloud/data-catalog-hands-on-guide-search-get-lookup-with-python-82d99bfb4056
 [6]: https://medium.com/google-cloud/data-catalog-hands-on-guide-templates-tags-with-python-c45eb93372ef
-[7]: https://docs.google.com/spreadsheets/d/1DoILfOD_Fb1r5otEz2CUH8SKGkyV5juLakGODTTfOjY
+[7]: https://github.com/ricardolsmendes/gcp-datacatalog-python/tree/master/sample-input/load-template-csv
+[8]: https://docs.google.com/spreadsheets/d/1DoILfOD_Fb1r5otEz2CUH8SKGkyV5juLakGODTTfOjY
