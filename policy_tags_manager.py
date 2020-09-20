@@ -7,7 +7,7 @@ import logging
 import sys
 
 from google.cloud import datacatalog_v1beta1
-from google.cloud.datacatalog import types
+from google.cloud.datacatalog import Taxonomy
 
 
 """
@@ -52,10 +52,9 @@ class DataCatalogFacade:
     def create_taxonomy(self, project_id, display_name, description=None):
         """Create a Taxonomy."""
 
-        location = datacatalog_v1beta1.PolicyTagManagerClient.location_path(
-            project_id, _CLOUD_PLATFORM_LOCATION)
+        location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_LOCATION}'
 
-        taxonomy = types.Taxonomy()
+        taxonomy = Taxonomy()
         taxonomy.display_name = display_name
         taxonomy.description = description
 
