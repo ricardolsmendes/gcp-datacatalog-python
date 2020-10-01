@@ -1,8 +1,8 @@
-ID,Display name,Type
-booleanField1,Boolean field 1,BOOL
-booleanField2,Boolean field 2,BOOL
-doubleField,Double field,DOUBLE
-enumFieldXyz,ENUM field XYZ,ENUM
-multivaluedFieldIgnored,Multivalued field to be ignored (no values file),MULTI
-multivaluedFieldXyz,Multivalued field XYZ,MULTI
-stringField,String field,STRING
+ID,Display name,Type,
+booleanField1,Boolean field 1,BOOL,
+booleanField2,Boolean field 2,BOOL,
+doubleField,Double field,DOUBLE,
+enumFieldXyz,ENUM field XYZ,ENUM,
+multivaluedFieldIgnored,Multivalued field to be ignored (no values file),MULTI,
+multivaluedFieldXyz,Multivalued field XYZ,MULTI,
+stringField,String field,STRING,
