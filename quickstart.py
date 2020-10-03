@@ -13,9 +13,11 @@ medium.com/google-cloud/data-catalog-hands-on-guide-search-get-lookup-with-pytho
 for further details.
 """
 import argparse
+from datetime import datetime
 
 from google.api_core import exceptions
 from google.cloud import datacatalog
+from google.protobuf import timestamp_pb2
 
 
 class DataCatalogFacade:
@@ -60,9 +62,11 @@ class DataCatalogFacade:
         tag_template.display_name = display_name
 
         for descriptor in primitive_fields_descriptors:
-            tag_template.fields[descriptor['id']].type.primitive_type = \
-                descriptor['primitive_type']
-            tag_template.fields[descriptor['id']].display_name = descriptor['display_name']
+            field = datacatalog.TagTemplateField()
+            field.display_name = descriptor['display_name']
+            field.type.primitive_type = descriptor['primitive_type']
+
+            tag_template.fields[descriptor['id']] = field
 
         return self.__datacatalog.create_tag_template(parent=location,
                                                       tag_template_id=template_id,
@@ -75,7 +79,10 @@ class DataCatalogFacade:
         field.display_name = display_name
 
         for enum_value in enum_values:
-            field.type.enum_type.allowed_values.add().display_name = enum_value['display_name']
+            value = datacatalog.FieldType.EnumType.EnumValue()
+            value.display_name = enum_value['display_name']
+
+            field.type.enum_type.allowed_values.append(value)
 
         return self.__datacatalog.create_tag_template_field(parent=template_name,
                                                             tag_template_field_id=field_id,
@@ -103,8 +110,9 @@ class DataCatalogFacade:
         tag.template = tag_template.name
 
         for descriptor in fields_descriptors:
-            self.__set_tag_field_value(tag.fields[descriptor['id']], descriptor['value'],
-                                       descriptor['primitive_type'])
+            field = datacatalog.TagField()
+            self.__set_tag_field_value(field, descriptor['value'], descriptor['primitive_type'])
+            tag.fields[descriptor['id']] = field
 
         return self.__datacatalog.create_tag(parent=entry.name, tag=tag)
 
@@ -141,7 +149,10 @@ class DataCatalogFacade:
 
     @classmethod
     def __set_timestamp_field_value(cls, field, value_as_string):
-        field.timestamp_value.FromJsonString(value_as_string)
+        dt = datetime.strptime(value_as_string, '%Y-%m-%dT%H:%M:%S%z')
+        timestamp = timestamp_pb2.Timestamp()
+        timestamp.FromDatetime(dt)
+        field.timestamp_value = timestamp
 
     def delete_tag(self, name):
         """Delete a Tag."""
@@ -204,8 +215,8 @@ def __show_datacatalog_api_core_features(organization_id, project_id):
 
     primitive_fields_descriptors = [{
         'id': 'has_pii',
-        'primitive_type': datacatalog.FieldType.PrimitiveType.BOOL,
-        'display_name': 'Has PII'
+        'display_name': 'Has PII',
+        'primitive_type': datacatalog.FieldType.PrimitiveType.BOOL
     }]
 
     template = datacatalog_facade.create_tag_template(

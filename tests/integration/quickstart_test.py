@@ -9,7 +9,7 @@ import quickstart
 TEST_ORGANIZATION_ID = os.environ['GOOGLE_CLOUD_TEST_ORGANIZATION_ID']
 TEST_PROJECT_ID = os.environ['GOOGLE_CLOUD_TEST_PROJECT_ID']
 
-datacatalog = datacatalog.DataCatalogClient()
+datacatalog_client = datacatalog.DataCatalogClient()
 datacatalog_facade = quickstart.DataCatalogFacade()
 
 
@@ -85,7 +85,7 @@ def test_datacatalog_facade_get_entry(bigquery_table):
     table_search_result = next(result for result in results
                                if result.linked_resource == table_resource_name)
 
-    assert datacatalog.get_entry(name=table_search_result.relative_resource_name)
+    assert datacatalog_client.get_entry(name=table_search_result.relative_resource_name)
 
 
 def test_datacatalog_facade_get_entry_fail_invalid_argument(bigquery_table):
@@ -143,7 +143,7 @@ def test_datacatalog_facade_create_tag_template():
         f'/locations/us-central1/tagTemplates/quickstart_test_template'
 
     # Clean up.
-    datacatalog.delete_tag_template(name=template.name, force=True)
+    datacatalog_client.delete_tag_template(name=template.name, force=True)
 
 
 def test_datacatalog_facade_create_tag_template_field(datacatalog_tag_template):
@@ -158,7 +158,7 @@ def test_datacatalog_facade_create_tag_template_field(datacatalog_tag_template):
     assert field.type.enum_type
 
     # Clean up.
-    datacatalog.delete_tag_template_field(
+    datacatalog_client.delete_tag_template_field(
         name=f'{datacatalog_tag_template.name}/fields/quickstart_test_tag_template_enum_field',
         force=True)
 
@@ -197,4 +197,4 @@ def test_datacatalog_facade_create_tag(bigquery_table, datacatalog_tag_template)
     assert entry.name in tag.name
 
     # Clean up.
-    datacatalog.delete_tag(name=tag.name)
+    datacatalog_client.delete_tag(name=tag.name)
