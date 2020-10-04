@@ -31,6 +31,7 @@ jobs:
           command: |
             . venv/bin/activate
             pip install --upgrade -r requirements.txt
+            pip install --upgrade yapf
 
       - save_cache: # Special step to save the dependency cache.
           key: dependency-cache-{{ checksum "requirements.txt" }}
@@ -42,6 +43,12 @@ jobs:
           command: |
             . venv/bin/activate
             pytest ./tests/unit
+
+      - run:
+          name: Run YAPF style check on source and test code
+          command: |
+            . venv/bin/activate
+            yapf --diff --recursive  ./*.py ./tests
 
       - store_artifacts:
           path: htmlcov

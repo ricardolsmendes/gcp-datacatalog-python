@@ -66,7 +66,7 @@ class TemplateMakerTest(unittest.TestCase):
         self.assertEqual(2, datacatalog_facade.create_tag_template.call_count)
 
     def test_run_should_ignore_template_for_multivalued_fields_if_file_not_found(
-        self, mock_csv_files_reader):  # noqa
+            self, mock_csv_files_reader):  # noqa
 
         mock_csv_files_reader.read_master.return_value = [['val1', 'val2', 'MULTI']]
         mock_csv_files_reader.read_helper.side_effect = FileNotFoundError()
@@ -115,10 +115,7 @@ class TemplateMakerTest(unittest.TestCase):
 class CSVFilesReaderTest(unittest.TestCase):
 
     def test_read_master_should_return_content_as_list(self, mock_open):
-        mock_open.return_value = io.StringIO(
-            'col1,col2,col3\n'
-            'val1,val2,val3\n'
-        )
+        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1,val2,val3\n')
 
         content = load_template_csv.CSVFilesReader.read_master('test-folder', 'test-file-id')
 
@@ -128,10 +125,7 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual('val2', content[0][1])
 
     def test_read_helper_should_return_content_as_list(self, mock_open):
-        mock_open.return_value = io.StringIO(
-            'col1\n'
-            'val1\n'
-        )
+        mock_open.return_value = io.StringIO('col1\n' 'val1\n')
 
         content = load_template_csv.CSVFilesReader.read_helper('test-folder', 'test-file-id')
 
@@ -141,20 +135,14 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual('val1', content[0][0])
 
     def test_read_should_return_exact_number_values_per_line(self, mock_open):
-        mock_open.return_value = io.StringIO(
-            'col1,col2,col3\n'
-            'val1,val2,val3\n'
-        )
+        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1,val2,val3\n')
 
         content = load_template_csv.CSVFilesReader.read_master(None, None, values_per_line=2)
 
         self.assertEqual(2, len(content[0]))
 
     def test_read_should_return_stripped_content(self, mock_open):
-        mock_open.return_value = io.StringIO(
-            'col1,col2,col3\n'
-            'val1, val2  ,val3\n'
-        )
+        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1, val2  ,val3\n')
 
         self.assertEqual('val2', load_template_csv.CSVFilesReader.read_master(None, None)[0][1])
 
@@ -175,12 +163,10 @@ class DataCatalogFacadeTest(unittest.TestCase):
             project_id='project-id',
             template_id='template_id',
             display_name='Test Display Name',
-            fields_descriptors=[
-                ['test-string-field-id', 'Test String Field Display Name', 'STRING'],
-                ['test-enum-field-id', 'Test ENUM Field Display Name', 'ENUM']
-            ],
-            enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']}
-        )
+            fields_descriptors=[[
+                'test-string-field-id', 'Test String Field Display Name', 'STRING'
+            ], ['test-enum-field-id', 'Test ENUM Field Display Name', 'ENUM']],
+            enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']})
 
         datacatalog_client = self.__datacatalog_client
         datacatalog_client.create_tag_template.assert_called_once()

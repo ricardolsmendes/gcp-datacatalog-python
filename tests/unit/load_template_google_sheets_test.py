@@ -156,10 +156,7 @@ class GoogleSheetsReaderTest(unittest.TestCase):
         sheets_facade = self.__sheets_facade
         sheets_facade.read_sheet.return_value = {
             'valueRanges': [{
-                'values': [
-                    ['col1', 'col2', 'col3'],
-                    ['val1', 'val2', 'val3']
-                ]
+                'values': [['col1', 'col2', 'col3'], ['val1', 'val2', 'val3']]
             }]
         }
 
@@ -171,14 +168,7 @@ class GoogleSheetsReaderTest(unittest.TestCase):
 
     def test_read_helper_should_return_content_as_list(self):
         sheets_facade = self.__sheets_facade
-        sheets_facade.read_sheet.return_value = {
-            'valueRanges': [{
-                'values': [
-                    ['col1'],
-                    ['val1']
-                ]
-            }]
-        }
+        sheets_facade.read_sheet.return_value = {'valueRanges': [{'values': [['col1'], ['val1']]}]}
 
         content = self.__sheets_reader.read_helper('test-id', 'test-name')
 
@@ -190,10 +180,7 @@ class GoogleSheetsReaderTest(unittest.TestCase):
         sheets_facade = self.__sheets_facade
         sheets_facade.read_sheet.return_value = {
             'valueRanges': [{
-                'values': [
-                    ['col1', 'col2', 'col3'],
-                    ['val1', 'val2', 'val3']
-                ]
+                'values': [['col1', 'col2', 'col3'], ['val1', 'val2', 'val3']]
             }]
         }
 
@@ -205,10 +192,7 @@ class GoogleSheetsReaderTest(unittest.TestCase):
         sheets_facade = self.__sheets_facade
         sheets_facade.read_sheet.return_value = {
             'valueRanges': [{
-                'values': [
-                    ['col1', 'col2', 'col3'],
-                    ['val1', ' val2  ', 'val3']
-                ]
+                'values': [['col1', 'col2', 'col3'], ['val1', ' val2  ', 'val3']]
             }]
         }
 
@@ -231,12 +215,10 @@ class DataCatalogFacadeTest(unittest.TestCase):
             project_id='project-id',
             template_id='template_id',
             display_name='Test Display Name',
-            fields_descriptors=[
-                ['test-string-field-id', 'Test String Field Display Name', 'STRING'],
-                ['test-enum-field-id', 'Test ENUM Field Display Name', 'ENUM']
-            ],
-            enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']}
-        )
+            fields_descriptors=[[
+                'test-string-field-id', 'Test String Field Display Name', 'STRING'
+            ], ['test-enum-field-id', 'Test ENUM Field Display Name', 'ENUM']],
+            enums_names={'test-enum-field-id': ['TEST_ENUM_VALUE']})
 
         datacatalog_client = self.__datacatalog_client
         datacatalog_client.create_tag_template.assert_called_once()

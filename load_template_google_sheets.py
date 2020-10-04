@@ -14,13 +14,6 @@ from googleapiclient import discovery
 from googleapiclient import errors
 from oauth2client import service_account
 
-
-"""
-Constants
-========================================
-"""
-
-
 _CLOUD_PLATFORM_REGION = 'us-central1'
 
 _CUSTOM_MULTIVALUED_TYPE = 'MULTI'
@@ -29,12 +22,6 @@ _DATA_CATALOG_ENUM_TYPE = 'ENUM'
 _DATA_CATALOG_NATIVE_TYPES = ['BOOL', 'DOUBLE', 'ENUM', 'STRING', 'TIMESTAMP']
 
 _LOOKING_FOR_SHEET_LOG_FORMAT = 'Looking for {} sheet {} | {}...'
-
-
-"""
-Template maker
-========================================
-"""
 
 
 class TemplateMaker:

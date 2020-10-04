@@ -12,13 +12,6 @@ import unicodedata
 from google.api_core import exceptions
 from google.cloud import datacatalog
 
-
-"""
-Constants
-========================================
-"""
-
-
 _CLOUD_PLATFORM_REGION = 'us-central1'
 
 _CUSTOM_MULTIVALUED_TYPE = 'MULTI'
@@ -28,12 +21,6 @@ _DATA_CATALOG_NATIVE_TYPES = ['BOOL', 'DOUBLE', 'ENUM', 'STRING', 'TIMESTAMP']
 
 _FOLDER_PLUS_CSV_FILENAME_FORMAT = '{}/{}.csv'
 _LOOKING_FOR_FILE_LOG_FORMAT = 'Looking for {} file {}...'
-
-
-"""
-Template maker
-========================================
-"""
 
 
 class TemplateMaker:
