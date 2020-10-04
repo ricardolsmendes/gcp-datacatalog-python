@@ -8,20 +8,7 @@ import sys
 
 from google.cloud import datacatalog
 
-
-"""
-Constants
-========================================
-"""
-
-
 _CLOUD_PLATFORM_LOCATION = 'us'
-
-
-"""
-Taxonomy manager
-========================================
-"""
 
 
 class TaxonomyManager:
@@ -57,8 +44,7 @@ class DataCatalogFacade:
         taxonomy.display_name = display_name
         taxonomy.description = description
 
-        created_taxonomy = self.__datacatalog.create_taxonomy(
-            parent=location, taxonomy=taxonomy)
+        created_taxonomy = self.__datacatalog.create_taxonomy(parent=location, taxonomy=taxonomy)
 
         logging.info(f'===> Taxonomy created: {created_taxonomy.name}')
 
@@ -89,11 +75,8 @@ class PolicyTagsManagerCLI:
         subparsers = parser.add_subparsers()
 
         create_taxonomy_parser = subparsers.add_parser('create-taxonomy', help='Create Taxonomy')
-        create_taxonomy_parser.add_argument('--display-name',
-                                            help='Display name',
-                                            required=True)
-        create_taxonomy_parser.add_argument('--description',
-                                            help='Description')
+        create_taxonomy_parser.add_argument('--display-name', help='Display name', required=True)
+        create_taxonomy_parser.add_argument('--description', help='Description')
         create_taxonomy_parser.add_argument('--project-id',
                                             help='GCP Project to create the Taxonomy into',
                                             required=True)
@@ -103,9 +86,9 @@ class PolicyTagsManagerCLI:
 
     @classmethod
     def __create_taxonomy(cls, args):
-        TaxonomyManager().create_taxonomy(
-            project_id=args.project_id, display_name=args.display_name,
-            description=args.description)
+        TaxonomyManager().create_taxonomy(project_id=args.project_id,
+                                          display_name=args.display_name,
+                                          description=args.description)
 
 
 """
