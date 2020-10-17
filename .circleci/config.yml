@@ -31,7 +31,7 @@ jobs:
           command: |
             . venv/bin/activate
             pip install --upgrade -r requirements.txt
-            pip install --upgrade yapf
+            pip install --upgrade flake8 yapf
 
       - save_cache: # Special step to save the dependency cache.
           key: dependency-cache-{{ checksum "requirements.txt" }}
@@ -48,7 +48,13 @@ jobs:
           name: Run YAPF style check on source and test code
           command: |
             . venv/bin/activate
-            yapf --diff --recursive  ./*.py ./tests
+            yapf --diff --recursive ./*.py ./tests
+
+      - run:
+          name: Run Flake8 linter on source and test code
+          command: |
+            . venv/bin/activate
+            flake8 ./*.py ./tests
 
       - store_artifacts:
           path: htmlcov
