@@ -5,6 +5,13 @@ Self-contained ready-to-use Python scripts to help Data Citizens who work with
 
 [![CircleCI][2]][3]
 
+<!--
+  DO NOT UPDATE THE TABLE OF CONTENTS MANUALLY
+  run `npx markdown-toc -i README.md`.
+
+  Please stick to 120-character line wraps as much as you can.
+-->
+
 ## Table of Contents
 
 <!-- toc -->
@@ -30,6 +37,8 @@ Self-contained ready-to-use Python scripts to help Data Citizens who work with
   * [5.4. Run load_template_google_sheets.py](#54-run-load_template_google_sheetspy)
 
 <!-- tocstop -->
+
+---
 
 ## 1. Understand the concepts behind this code
 
