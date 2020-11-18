@@ -70,5 +70,9 @@ workflows:
   continuous-integration:
     jobs:
       - set-up
-      - test
-      - lint
+      - test:
+          - requires:
+              - set-up
+      - lint:
+          - requires:
+              - test
