@@ -92,7 +92,7 @@ def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
 
 @pytest.fixture
 def datacatalog_tag_template():
-    location = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
+    location = datacatalog.DataCatalogClient.common_location_path(TEST_PROJECT_ID, 'us-central1')
 
     # Delete a Tag Template with the same name if it already exists.
     try:
@@ -132,7 +132,7 @@ def __generate_uuid(length=5):
 
 def __make_primitive_type_template_field(primitive_type):
     field = datacatalog.TagTemplateField()
-    field.type.primitive_type = primitive_type
+    field.type_.primitive_type = primitive_type
 
     return field
 
@@ -142,6 +142,6 @@ def __make_enum_type_template_field(values):
     for value in values:
         enum_value = datacatalog.FieldType.EnumType.EnumValue()
         enum_value.display_name = value
-        field.type.enum_type.allowed_values.append(enum_value)
+        field.type_.enum_type.allowed_values.append(enum_value)
 
     return field

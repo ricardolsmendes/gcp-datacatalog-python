@@ -174,7 +174,8 @@ class DataCatalogFacade:
                             enums_names=None):
         """Create a Tag Template."""
 
-        location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_REGION}'
+        location = datacatalog.DataCatalogClient.common_location_path(
+            project_id, _CLOUD_PLATFORM_REGION)
 
         tag_template = datacatalog.TagTemplate()
         tag_template.display_name = display_name
@@ -186,12 +187,12 @@ class DataCatalogFacade:
             field_id = descriptor[0]
             field_type = descriptor[2]
             if not field_type == _DATA_CATALOG_ENUM_TYPE:
-                field.type.primitive_type = datacatalog.FieldType.PrimitiveType[field_type]
+                field.type_.primitive_type = datacatalog.FieldType.PrimitiveType[field_type]
             else:
                 for enum_name in enums_names[field_id]:
                     enum_value = datacatalog.FieldType.EnumType.EnumValue()
                     enum_value.display_name = enum_name
-                    field.type.enum_type.allowed_values.append(enum_value)
+                    field.type_.enum_type.allowed_values.append(enum_value)
 
             tag_template.fields[field_id] = field
 
