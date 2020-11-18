@@ -71,8 +71,8 @@ workflows:
     jobs:
       - set-up
       - test:
-          - requires:
-              - set-up
+          requires:
+            - set-up
       - lint:
-          - requires:
-              - test
+          requires:
+            - test
