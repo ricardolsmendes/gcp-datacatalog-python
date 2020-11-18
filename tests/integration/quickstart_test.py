@@ -155,7 +155,7 @@ def test_datacatalog_facade_create_tag_template_field(datacatalog_tag_template):
         display_name='Testing enum fields',
         enum_values=enum_values)
 
-    assert field.type.enum_type
+    assert field.type_.enum_type
 
     # Clean up.
     datacatalog_client.delete_tag_template_field(

@@ -64,7 +64,7 @@ class DataCatalogFacade:
         for descriptor in primitive_fields_descriptors:
             field = datacatalog.TagTemplateField()
             field.display_name = descriptor['display_name']
-            field.type.primitive_type = descriptor['primitive_type']
+            field.type_.primitive_type = descriptor['primitive_type']
 
             tag_template.fields[descriptor['id']] = field
 
@@ -82,7 +82,7 @@ class DataCatalogFacade:
             value = datacatalog.FieldType.EnumType.EnumValue()
             value.display_name = enum_value['display_name']
 
-            field.type.enum_type.allowed_values.append(value)
+            field.type_.enum_type.allowed_values.append(value)
 
         return self.__datacatalog.create_tag_template_field(parent=template_name,
                                                             tag_template_field_id=field_id,
@@ -149,7 +149,7 @@ class DataCatalogFacade:
 
     @classmethod
     def __set_timestamp_field_value(cls, field, value_as_string):
-        dt = datetime.strptime(value_as_string, '%Y-%m-%dT%H:%M:%S%z')
+        dt = datetime.strptime(value_as_string, '%Y-%m-%dT%H:%M:%SZ')
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(dt)
         field.timestamp_value = timestamp
