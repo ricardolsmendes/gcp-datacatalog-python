@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  test-and-lint:
+  build:
     docker:
       - image: circleci/python:3.6.9
 
