@@ -92,7 +92,7 @@ def datacatalog_tag(datacatalog_table_entry, datacatalog_tag_template):
 
 @pytest.fixture
 def datacatalog_tag_template():
-    location = f'projects/{TEST_PROJECT_ID}/locations/us-central1'
+    location = datacatalog.DataCatalogClient.common_location_path(TEST_PROJECT_ID, 'us-central1')
 
     # Delete a Tag Template with the same name if it already exists.
     try:

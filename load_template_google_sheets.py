@@ -172,7 +172,8 @@ class DataCatalogFacade:
                             enums_names=None):
         """Create a Tag Template."""
 
-        location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_REGION}'
+        location = datacatalog.DataCatalogClient.common_location_path(
+            project_id, _CLOUD_PLATFORM_REGION)
 
         tag_template = datacatalog.TagTemplate()
         tag_template.display_name = display_name

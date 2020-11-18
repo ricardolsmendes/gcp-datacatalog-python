@@ -56,7 +56,7 @@ class DataCatalogFacade:
                             primitive_fields_descriptors):
         """Create a Tag Template."""
 
-        location = f'projects/{project_id}/locations/us-central1'
+        location = self.__datacatalog.common_location_path(project_id, 'us-central1')
 
         tag_template = datacatalog.TagTemplate()
         tag_template.display_name = display_name
