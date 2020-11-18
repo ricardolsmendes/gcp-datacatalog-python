@@ -23,6 +23,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
+            pip install --upgrade -r requirements.txt
       - persist_to_workspace:
           root: .
           paths:
