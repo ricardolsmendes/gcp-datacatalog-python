@@ -1,61 +1,79 @@
+# ======================================================================
 # Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
-version: 2
-jobs:
-  build:
+# Check https://circleci.com/docs/2.0/language-python/ for more details.
+# ======================================================================
+
+version: 2.1
+
+executors:
+  python-executor:
     docker:
       - image: circleci/python:3.6.9
-
     working_directory: ~/repo
 
+jobs:
+
+  set-up:
+    executor: python-executor
     steps:
       - checkout
-
       - run:
           name: Set up a virtual environment
-          command: python3 -m venv venv
-
-      - restore_cache: # Download and cache dependencies.
-          key: dependency-cache-{{ checksum "requirements.txt" }}
-
-      - run:
-          name: Install/upgrade pip and setup-related packages
           command: |
+            python3 -m venv venv
             . venv/bin/activate
-            pip install --upgrade pip setuptools wheel
-
-      - run:
-          name: Install dependencies
-          command: |
-            . venv/bin/activate
+            pip install --upgrade pip
             pip install --upgrade -r requirements.txt
-            pip install --upgrade flake8 yapf
-
-      - save_cache: # Special step to save the dependency cache.
-          key: dependency-cache-{{ checksum "requirements.txt" }}
+      - persist_to_workspace:
+          root: .
           paths:
-            - ./venv
+            - venv
 
+  test:
+    executor: python-executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Run the unit tests
           command: |
             . venv/bin/activate
             pytest ./tests/unit
+      - persist_to_workspace:
+          root: .
+          paths:
+            - venv
+      - store_artifacts:
+          path: htmlcov
+          destination: htmlcov
 
+  lint:
+    executor: python-executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Run YAPF style check on source and test code
           command: |
             . venv/bin/activate
+            pip install --upgrade yapf
             yapf --diff --recursive ./*.py ./tests
-
       - run:
           name: Run Flake8 linter on source and test code
           command: |
             . venv/bin/activate
+            pip install --upgrade flake8
             flake8 ./*.py ./tests
 
-      - store_artifacts:
-          path: htmlcov
-          destination: htmlcov
+workflows:
+  continuous-integration:
+    jobs:
+      - set-up
+      - test:
+          requires:
+            - set-up
+      - lint:
+          requires:
+            - test
