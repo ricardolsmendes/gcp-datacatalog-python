@@ -38,7 +38,8 @@ class DataCatalogFacade:
     def create_taxonomy(self, project_id, display_name, description=None):
         """Create a Taxonomy."""
 
-        location = f'projects/{project_id}/locations/{_CLOUD_PLATFORM_LOCATION}'
+        location = datacatalog.PolicyTagManagerClient.common_location_path(
+            project_id, _CLOUD_PLATFORM_LOCATION)
 
         taxonomy = datacatalog.Taxonomy()
         taxonomy.display_name = display_name
