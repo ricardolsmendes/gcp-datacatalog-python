@@ -115,7 +115,8 @@ class TemplateMakerTest(unittest.TestCase):
 class CSVFilesReaderTest(unittest.TestCase):
 
     def test_read_master_should_return_content_as_list(self, mock_open):
-        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1,val2,val3\n')
+        mock_open.return_value = io.StringIO('col1,col2,col3\n'
+                                             'val1,val2,val3\n')
 
         content = load_template_csv.CSVFilesReader.read_master('test-folder', 'test-file-id')
 
@@ -125,7 +126,8 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual('val2', content[0][1])
 
     def test_read_helper_should_return_content_as_list(self, mock_open):
-        mock_open.return_value = io.StringIO('col1\n' 'val1\n')
+        mock_open.return_value = io.StringIO('col1\n'
+                                             'val1\n')
 
         content = load_template_csv.CSVFilesReader.read_helper('test-folder', 'test-file-id')
 
@@ -135,14 +137,16 @@ class CSVFilesReaderTest(unittest.TestCase):
         self.assertEqual('val1', content[0][0])
 
     def test_read_should_return_exact_number_values_per_line(self, mock_open):
-        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1,val2,val3\n')
+        mock_open.return_value = io.StringIO('col1,col2,col3\n'
+                                             'val1,val2,val3\n')
 
         content = load_template_csv.CSVFilesReader.read_master(None, None, values_per_line=2)
 
         self.assertEqual(2, len(content[0]))
 
     def test_read_should_return_stripped_content(self, mock_open):
-        mock_open.return_value = io.StringIO('col1,col2,col3\n' 'val1, val2  ,val3\n')
+        mock_open.return_value = io.StringIO('col1,col2,col3\n'
+                                             'val1, val2  ,val3\n')
 
         self.assertEqual('val2', load_template_csv.CSVFilesReader.read_master(None, None)[0][1])
 

@@ -23,30 +23,10 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
-            pip install --upgrade -r requirements.txt
       - persist_to_workspace:
           root: .
           paths:
             - venv
-
-  test:
-    executor: python-executor
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Run the unit tests
-          command: |
-            . venv/bin/activate
-            pytest ./tests/unit
-      - persist_to_workspace:
-          root: .
-          paths:
-            - venv
-      - store_artifacts:
-          path: htmlcov
-          destination: htmlcov
 
   lint:
     executor: python-executor
@@ -67,13 +47,34 @@ jobs:
             pip install --upgrade flake8
             flake8 ./*.py ./tests
 
+  test:
+    executor: python-executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run the unit tests
+          command: |
+            . venv/bin/activate
+            pip install --upgrade pytest-cov
+            pip install --upgrade -r requirements.txt
+            pytest ./tests/unit
+      - persist_to_workspace:
+          root: .
+          paths:
+            - venv
+      - store_artifacts:
+          path: htmlcov
+          destination: htmlcov
+
 workflows:
   continuous-integration:
     jobs:
       - set-up
-      - test:
-          requires:
-            - set-up
       - lint:
           requires:
-            - test
+            - set-up
+      - test:
+          requires:
+            - lint
