@@ -3,6 +3,8 @@
 Self-contained ready-to-use Python scripts to help Data Citizens who work with
 [Google Cloud Data Catalog][1].
 
+[![license](https://img.shields.io/github/license/ricardolsmendes/gcp-datacatalog-python.svg)](https://github.com/ricardolsmendes/gcp-datacatalog-python/blob/master/LICENSE)
+[![issues](https://img.shields.io/github/issues/ricardolsmendes/gcp-datacatalog-python.svg)](https://github.com/ricardolsmendes/gcp-datacatalog-python/issues)
 [![CircleCI][2]][3]
 
 <!--
